@@ -9,8 +9,8 @@ module dshr_strdata_mod
   use ESMF             , only : ESMF_VMBroadCast, ESMF_MeshIsCreated, ESMF_MeshCreate
   use ESMF             , only : ESMF_Calendar, ESMF_CALKIND_NOLEAP, ESMF_CALKIND_GREGORIAN
   use ESMF             , only : ESMF_CalKind_Flag, ESMF_Time, ESMF_TimeInterval
-  use ESMF             , only : ESMF_TimeIntervalGet, ESMF_TYPEKIND_R8, ESMF_FieldCreate
-  use ESMF             , only : ESMF_FILEFORMAT_ESMFMESH, ESMF_FieldCreate
+  use ESMF             , only : ESMF_TimeIntervalGet, ESMF_TYPEKIND_R8, ESMF_TYPEKIND_I4
+  use ESMF             , only : ESMF_FILEFORMAT_ESMFMESH, ESMF_FieldCreate, ESMF_FieldDestroy, ESMF_FieldWrite
   use ESMF             , only : ESMF_FieldBundleCreate, ESMF_MESHLOC_ELEMENT, ESMF_FieldBundleAdd
   use ESMF             , only : ESMF_POLEMETHOD_ALLAVG, ESMF_EXTRAPMETHOD_NEAREST_STOD, ESMF_REGRIDMETHOD_BILINEAR, ESMF_REGRIDMETHOD_NEAREST_STOD
   use ESMF             , only : ESMF_ClockGet, operator(-), operator(==), ESMF_CALKIND_NOLEAP
@@ -18,7 +18,7 @@ module dshr_strdata_mod
   use ESMF             , only : ESMF_TERMORDER_SRCSEQ, ESMF_FieldRegrid, ESMF_FieldFill
   use ESMF             , only : ESMF_REGION_TOTAL, ESMF_FieldGet, ESMF_TraceRegionExit, ESMF_TraceRegionEnter
   use ESMF             , only : ESMF_LOGMSG_INFO, ESMF_LogWrite
-  use shr_kind_mod     , only : r8=>shr_kind_r8, r4=>shr_kind_r4, i2=>shr_kind_I2
+  use shr_kind_mod     , only : r8=>shr_kind_r8, r4=>shr_kind_r4, i2=>shr_kind_I2, i4=>shr_kind_r4
   use shr_kind_mod     , only : cs=>shr_kind_cs, cl=>shr_kind_cl, cxx=>shr_kind_cxx
   use shr_sys_mod      , only : shr_sys_abort
   use shr_const_mod    , only : shr_const_pi, shr_const_cDay, shr_const_spval
@@ -141,6 +141,8 @@ module dshr_strdata_mod
   real(r8)         ,parameter :: deg2rad = SHR_CONST_PI/180.0_r8
   character(*)     ,parameter :: u_FILE_u = &
        __FILE__
+
+  logical :: dststatus_print = .true.
 
 !===============================================================================
 contains
@@ -395,6 +397,13 @@ contains
     integer                      :: nvars
     integer                      :: i, stream_nlev, index
     character(CL)                :: stream_vectors
+    character(CL)                :: fname
+    type(ESMF_Field)             :: dststatusfield
+    type(ESMF_Field)             :: doffield
+    integer(I4), pointer         :: dof(:) => null()
+    integer                      :: lsize_dof
+    type(ESMF_DistGrid)          :: distgrid
+    character(CS)                :: cns
     character(len=*), parameter  :: subname='(shr_sdat_init)'
     ! ----------------------------------------------
 
@@ -524,6 +533,11 @@ contains
           end if
        endif
 
+       ! create a field to retrieve the dststatus field
+       dststatusfield = ESMF_FieldCreate(sdat%model_mesh, &
+            ESMF_TYPEKIND_I4, meshloc=ESMF_MESHLOC_ELEMENT, rc=rc)
+       if (chkerr(rc,__LINE__,u_FILE_u)) return
+
        ! Why not use fldbun_model rather than fldbun_data?
        index = sdat%pstrm(ns)%stream_lb
        call dshr_fldbun_getFieldN(sdat%pstrm(ns)%fldbun_data(index), 1, lfield_dst, rc=rc)
@@ -540,6 +554,7 @@ contains
                   extrapMethod=ESMF_EXTRAPMETHOD_NEAREST_STOD, &
                   dstMaskValues = (/0/), &  ! ignore destination points where the mask is 0
                   srcMaskValues = (/0/), &  ! ignore source points where the mask is 0
+                  dstStatusField=dststatusfield, &
                   srcTermProcessing=srcTermProcessing_Value, ignoreDegenerate=.true., rc=rc)
              if (chkerr(rc,__LINE__,u_FILE_u)) return
           else if (trim(sdat%stream(ns)%mapalgo) == 'redist') then
@@ -559,6 +574,33 @@ contains
              ! single point stream data, no action required.
           else
              call shr_sys_abort('ERROR: map algo '//trim(sdat%stream(ns)%mapalgo)//' is not supported')
+          end if
+
+          ! Output destination status field to file if requested
+          if (dststatus_print .and. sdat%stream(ns)%mapalgo /= 'none') then
+             write(cns, '(i0)') ns
+             fname = 'dststatus.stream'//trim(cns)//'.'//trim(sdat%stream(ns)%mapalgo)//'.nc'
+             call ESMF_LogWrite(trim(subname)//": writing dstStatusField to "//trim(fname), ESMF_LOGMSG_INFO)
+             call ESMF_FieldWrite(dststatusfield, filename=trim(fname), variableName='dststatus', &
+                  overwrite=.true., rc=rc)
+             if (chkerr(rc,__LINE__,u_FILE_u)) return
+
+             ! the sequence index in order to sort the dststatus field
+             call ESMF_MeshGet(sdat%model_mesh, elementDistgrid=distgrid, rc=rc)
+             if (chkerr(rc,__LINE__,u_FILE_u)) return
+             call ESMF_DistGridGet(distgrid, localDE=0, elementCount=lsize_dof, rc=rc)
+             if (chkerr(rc,__LINE__,u_FILE_u)) return
+             allocate(dof(lsize_dof))
+             call ESMF_DistGridGet(distgrid, localDE=0, seqIndexList=dof, rc=rc)
+             if (chkerr(rc,__LINE__,u_FILE_u)) return
+             doffield = ESMF_FieldCreate(sdat%model_mesh, dof, meshloc=ESMF_MESHLOC_ELEMENT, rc=rc)
+             if (chkerr(rc,__LINE__,u_FILE_u)) return
+
+             fname = 'dof.stream'//trim(cns)//'.'//trim(sdat%stream(ns)%mapalgo)//'.nc'
+             call ESMF_FieldWrite(doffield, fileName=trim(fname), variableName='dof', &
+                  overwrite=.true., rc=rc)
+             deallocate(dof)
+             call ESMF_FieldDestroy(doffield, rc=rc, noGarbage=.true.)
           end if
        end if
 
