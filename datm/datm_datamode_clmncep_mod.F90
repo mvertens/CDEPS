@@ -36,6 +36,7 @@ module datm_datamode_clmncep_mod
   real(r8), pointer :: Sa_dens(:)           => null()
   real(r8), pointer :: Sa_pbot(:)           => null()
   real(r8), pointer :: Sa_pslv(:)           => null()
+  real(r8), pointer :: Sa_o3(:)             => null()
   real(r8), pointer :: Faxa_lwdn(:)         => null()
   real(r8), pointer :: Faxa_rainc(:)        => null()
   real(r8), pointer :: Faxa_rainl(:)        => null()
@@ -46,6 +47,7 @@ module datm_datamode_clmncep_mod
   real(r8), pointer :: Faxa_swvdr(:)        => null()
   real(r8), pointer :: Faxa_swvdf(:)        => null()
   real(r8), pointer :: Faxa_swnet(:)        => null()
+  real(r8), pointer :: Faxa_ndep(:,:)       => null()
 
   ! stream data
   real(r8), pointer :: strm_z(:)         => null()
@@ -112,14 +114,16 @@ contains
 !===============================================================================
 
   subroutine datm_datamode_clmncep_advertise(exportState, fldsexport, flds_scalar_name, &
-       flds_co2, flds_wiso, presaero, rc)
+       flds_co2, flds_wiso, flds_presaero, flds_presndep, flds_preso3, rc)
 
     ! input/output variables
     type(esmf_State)   , intent(inout) :: exportState
     type(fldlist_type) , pointer       :: fldsexport
     logical            , intent(in)    :: flds_co2
     logical            , intent(in)    :: flds_wiso
-    logical            , intent(in)    :: presaero
+    logical            , intent(in)    :: flds_presaero
+    logical            , intent(in)    :: flds_presndep
+    logical            , intent(in)    :: flds_preso3
     character(len=*)   , intent(in)    :: flds_scalar_name
     integer            , intent(out)   :: rc
 
@@ -155,11 +159,17 @@ contains
        call dshr_fldList_add(fldsExport, 'Sa_co2prog')
        call dshr_fldList_add(fldsExport, 'Sa_co2diag')
     end if
-    if (presaero) then
+    if (flds_preso3) then
+       call dshr_fldList_add(fldsExport, 'Sa_o3')
+    end if
+    if (flds_presaero) then
        call dshr_fldList_add(fldsExport, 'Faxa_bcph'   , ungridded_lbound=1, ungridded_ubound=3)
        call dshr_fldList_add(fldsExport, 'Faxa_ocph'   , ungridded_lbound=1, ungridded_ubound=3)
        call dshr_fldList_add(fldsExport, 'Faxa_dstwet' , ungridded_lbound=1, ungridded_ubound=4)
        call dshr_fldList_add(fldsExport, 'Faxa_dstdry' , ungridded_lbound=1, ungridded_ubound=4)
+    end if
+    if (flds_presndep) then
+       call dshr_fldList_add(fldsExport, 'Faxa_ndep', ungridded_lbound=1, ungridded_ubound=2)
     end if
     if (flds_wiso) then
        call dshr_fldList_add(fldsExport, 'Faxa_rainc_wiso', ungridded_lbound=1, ungridded_ubound=3)
@@ -208,6 +218,8 @@ contains
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
     call shr_strdata_get_stream_pointer( sdat, 'Sa_rh'          , strm_rh    , rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
+    call shr_strdata_get_stream_pointer( sdat, 'Sa_z'           , strm_z  , rc)
+    if (ChkErr(rc,__LINE__,u_FILE_u)) return
     call shr_strdata_get_stream_pointer( sdat, 'Faxa_swdndf'    , strm_swdndf, rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
     call shr_strdata_get_stream_pointer( sdat, 'Faxa_swdndr'    , strm_swdndr, rc)
@@ -227,6 +239,8 @@ contains
     call shr_strdata_get_stream_pointer( sdat, 'Faxa_precn_16O' , strm_precn_16O, rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
     call shr_strdata_get_stream_pointer( sdat, 'Faxa_precn_18O' , strm_precn_18O, rc)
+    if (ChkErr(rc,__LINE__,u_FILE_u)) return
+    call shr_strdata_get_stream_pointer( sdat, 'Faxa_precn_HDO' , strm_precn_HDO, rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
     call shr_strdata_get_stream_pointer( sdat, 'Faxa_precn_HDO' , strm_precn_HDO, rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
@@ -292,6 +306,20 @@ contains
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
     call dshr_state_getfldptr(exportState, 'Faxa_lwdn'  , fldptr1=Faxa_lwdn  , rc=rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
+
+    call ESMF_StateGet(exportstate, 'Faxa_ndep', itemFlag, rc=rc)
+    if (ChkErr(rc,__LINE__,u_FILE_u)) return
+    if (itemflag /= ESMF_STATEITEM_NOTFOUND) then
+       call dshr_state_getfldptr(exportState, 'Faxa_ndep', fldptr2=Faxa_ndep, rc=rc)
+       if (ChkErr(rc,__LINE__,u_FILE_u)) return
+    end if
+
+    call ESMF_StateGet(exportstate, 'Sa_o3', itemFlag, rc=rc)
+    if (ChkErr(rc,__LINE__,u_FILE_u)) return
+    if (itemflag /= ESMF_STATEITEM_NOTFOUND) then
+       call dshr_state_getfldptr(exportState, 'Sa_o3', fldptr1=Sa_o3, rc=rc)
+       if (ChkErr(rc,__LINE__,u_FILE_u)) return
+    end if
 
     ! error check
     if (.not. associated(strm_wind) .or. .not. associated(strm_tbot)) then
@@ -384,7 +412,13 @@ contains
        Sa_ptem(n) = Sa_tbot(n)
 
        !--- pressure ---
-       if (.not. associated(strm_pbot)) Sa_pbot(n) = pstd
+       if (.not. associated(strm_pbot)) then
+          Sa_pbot(n) = pstd
+       else if (Sa_pbot(n) == 0._r8) then
+          ! This happens if you are using points over ocean where the mask is 0
+          Sa_pbot(n) = pstd
+       end if
+
        Sa_pslv(n) = Sa_pbot(n)
 
        !--- u, v wind velocity ---
@@ -404,12 +438,12 @@ contains
           e = strm_rh(n) * 0.01_r8 * datm_esat(tbot,tbot)
           qsat = (0.622_r8 * e)/(pbot - 0.378_r8 * e)
           Sa_shum(n) = qsat
-!          if (associated(strm_rh_16O) .and. associated(strm_rh_18O) .and. associated(strm_rh_HDO)) then
-             ! for isotopic tracer specific humidity, expect a delta, just keep the delta from the input file
-!             Sa_shum_wiso(1,n) = strm_rh_16O(n)
-!             Sa_shum_wiso(2,n) = strm_rh_18O(n)
-!             Sa_shum_wiso(3,n) = strm_rh_HDO(n)
-!          end if
+          ! for isotopic tracer specific humidity, expect a delta, just keep the delta from the input file
+          ! if (associated(strm_rh_16O) .and. associated(strm_rh_18O) .and. associated(strm_rh_HDO)) then
+          !   Sa_shum_wiso(1,n) = strm_rh_16O(n)
+          !   Sa_shum_wiso(2,n) = strm_rh_18O(n)
+          !   Sa_shum_wiso(3,n) = strm_rh_HDO(n)
+          ! end if
        else if (associated(strm_tdew)) then
           if (tdewmax < 50.0_r8) strm_tdew(n) = strm_tdew(n) + tkFrz
           e = datm_esat(strm_tdew(n),tbot)
@@ -538,6 +572,11 @@ contains
        Faxa_swvdf(:) = Faxa_swvdf(:) * strm_swdn_af(:)
     endif
     ! bias correction / anomaly forcing ( end block )
+
+    if (associated(Faxa_ndep)) then
+       ! convert ndep flux to units of kgN/m2/s (input is in gN/m2/s)
+       Faxa_ndep(:,:) = Faxa_ndep(:,:) / 1000._r8
+    end if
 
   end subroutine datm_datamode_clmncep_advance
 

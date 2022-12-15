@@ -17,7 +17,7 @@ module cdeps_docn_comp
   use ESMF             , only : ESMF_StateGet, operator(+), ESMF_AlarmRingerOff, ESMF_LogWrite
   use ESMF             , only : ESMF_Field, ESMF_FieldGet, ESMF_VmLogMemInfo
   use NUOPC            , only : NUOPC_CompDerive, NUOPC_CompSetEntryPoint, NUOPC_CompSpecialize
-  use NUOPC            , only : NUOPC_Advertise, NUOPC_CompAttributeGet
+  use NUOPC            , only : NUOPC_Advertise, NUOPC_CompAttributeGet, NUOPC_CompAttributeSet
   use NUOPC_Model      , only : model_routine_SS        => SetServices
   use NUOPC_Model      , only : model_label_Advance     => label_Advance
   use NUOPC_Model      , only : model_label_SetRunClock => label_SetRunClock
@@ -96,6 +96,7 @@ module cdeps_docn_comp
   character(CL)                :: restfilm = nullstr                  ! model restart file namelist
   integer                      :: nx_global
   integer                      :: ny_global
+  logical                      :: skip_restart_read = .false.         ! true => skip restart read in continuation run
 
   ! linked lists
   type(fldList_type) , pointer :: fldsImport => null()
@@ -191,7 +192,7 @@ contains
 
     namelist / docn_nml / datamode, &
          model_meshfile, model_maskfile, &
-         restfilm,  nx_global, ny_global, sst_constant_value
+         restfilm,  nx_global, ny_global, sst_constant_value, skip_restart_read
 
     rc = ESMF_SUCCESS
 
@@ -227,6 +228,7 @@ contains
        write(logunit,F01)' nx_global = ',nx_global
        write(logunit,F01)' ny_global = ',ny_global
        write(logunit,F00)' restfilm = ',trim(restfilm)
+       write(logunit,F02)' skip_restart_read = ',skip_restart_read
     endif
 
     ! Broadcast namelist input
@@ -237,6 +239,7 @@ contains
     call shr_mpi_bcast(ny_global                 , mpicom, 'ny_global')
     call shr_mpi_bcast(restfilm                  , mpicom, 'restfilm')
     call shr_mpi_bcast(sst_constant_value        , mpicom, 'sst_constant_value')
+    call shr_mpi_bcast(skip_restart_read         , mpicom, 'skip_restart_read')
 
     ! Special logic for prescribed aquaplanet
     if (datamode(1:9) == 'sst_aquap' .and. trim(datamode) /= 'sst_aquap_constant') then
@@ -302,6 +305,9 @@ contains
     integer                :: fieldcount
     real(r8), pointer      :: fldptr(:)
     integer                :: n
+    integer                :: imask
+    real(r8)               :: rmask
+    character(CL)          :: cvalue
     character(len=*), parameter :: subname=trim(module_name)//':(InitializeRealize) '
     !-------------------------------------------------------------------------------
 
@@ -309,6 +315,19 @@ contains
     call ESMF_VMLogMemInfo("Entering "//trim(subname))
     ! Initialize model mesh, restart flag, logunit, model_mask and model_frac
     call ESMF_TraceRegionEnter('docn_strdata_init')
+
+    ! If aquaplanet overwrite  model mask and model frac to 1
+    if (aquaplanet) then
+       imask = 1
+       write(cvalue,*) imask
+       call NUOPC_CompAttributeSet(gcomp, name='scol_ocnmask', value=cvalue, rc=rc)
+       if (ChkErr(rc,__LINE__,u_FILE_u)) return
+       rmask = 1._r8
+       write(cvalue,*) rmask
+       call NUOPC_CompAttributeSet(gcomp, name='scol_ocnfrac', value=cvalue, rc=rc)
+       if (ChkErr(rc,__LINE__,u_FILE_u)) return
+    end if
+
     call dshr_mesh_init(gcomp, sdat, nullstr, logunit, 'OCN', nx_global, ny_global, &
          model_meshfile, model_maskfile, model_mesh, model_mask, model_frac, restart_read, rc=rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
@@ -483,7 +502,7 @@ contains
        end select
 
        ! Read restart if needed
-       if (restart_read) then
+       if (restart_read .and. .not. skip_restart_read) then
           select case (trim(datamode))
           case('sstdata', 'sst_aquap_file')
              call docn_datamode_copyall_restart_read(restfilm, inst_suffix, logunit, my_task, mpicom, sdat)

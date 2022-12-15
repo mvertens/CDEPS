@@ -31,6 +31,7 @@ module dshr_mod
   use ESMF             , only : ESMF_TERMORDER_SRCSEQ, ESMF_FieldRegridStore, ESMF_SparseMatrixWrite
   use ESMF             , only : ESMF_Region_Flag, ESMF_REGION_TOTAL, ESMF_MAXSTR, ESMF_RC_NOT_VALID
   use ESMF             , only : ESMF_UtilStringUpperCase
+  use ESMF             , only : ESMF_GridCreate, ESMF_FILEFORMAT_SCRIP
   use shr_kind_mod     , only : r8=>shr_kind_r8, cs=>shr_kind_cs, cl=>shr_kind_cl, cx=>shr_kind_cx, cxx=>shr_kind_cxx, i8=>shr_kind_i8
   use shr_sys_mod      , only : shr_sys_abort
   use shr_mpi_mod      , only : shr_mpi_bcast
@@ -107,11 +108,13 @@ contains
   !===============================================================================
   subroutine dshr_init(gcomp, compname, sdat, mpicom, my_task, inst_index, inst_suffix, &
        flds_scalar_name, flds_scalar_num, flds_scalar_index_nx, flds_scalar_index_ny, logunit, rc)
-
+#ifdef CESMCOUPLED
+    use nuopc_shr_methods, only : set_component_logging
+#endif
     ! input/output variables
     type(ESMF_GridComp)                   :: gcomp
+    type(shr_strdata_type), intent(in) :: sdat   ! No longer used
     character(len=*)      , intent(in)    :: compname  !e.g. ATM, OCN, ...
-    type(shr_strdata_type), intent(inout) :: sdat
     integer               , intent(inout) :: mpicom
     integer               , intent(out)   :: my_task
     integer               , intent(out)   :: inst_index
@@ -126,6 +129,7 @@ contains
     ! local variables
     type(ESMF_VM)     :: vm
     logical           :: isPresent, isSet
+    integer           :: slogunit
     character(len=CX) :: cvalue
     character(len=CX) :: logmsg
     character(len=CX) :: diro
@@ -191,15 +195,18 @@ contains
     else
        logfile = "d"//shr_string_toLower(compname)//".log"
     endif
-
+#ifdef CESMCOUPLED
+    call set_component_logging(gcomp, my_task == main_task, logunit, slogunit, rc=rc)
+#else
     if (my_task == main_task) then 
        call ESMF_LogWrite(trim(subname)//' : output logging is written to '//trim(diro)//"/"//trim(logfile), ESMF_LOGMSG_INFO)
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
        open(newunit=logunit, file=trim(diro)//"/"//trim(logfile))
+       
     else
        logUnit = 6
     endif
-
+#endif
     ! set component instance and suffix
     call NUOPC_CompAttributeGet(gcomp, name="inst_suffix", isPresent=isPresent, rc=rc)
     if (chkerr(rc,__LINE__,u_FILE_u)) return
@@ -220,14 +227,6 @@ contains
        if (trim(cvalue) .eq. '.true.') write_restart_at_endofrun = .true.
     end if
 
-#ifdef CESMCOUPLED
-    sdat%pio_subsystem => shr_pio_getiosys(trim(compname))
-    sdat%io_type       =  shr_pio_getiotype(trim(compname))
-    sdat%io_format     =  shr_pio_getioformat(trim(compname))
-#else
-    call dshr_pio_init(gcomp, sdat, logunit, rc)
-#endif
-
   end subroutine dshr_init
 
   !===============================================================================
@@ -240,7 +239,7 @@ contains
 
     ! input/output variables
     type(ESMF_GridComp)        , intent(inout) :: gcomp
-    type(shr_strdata_type)     , intent(in)    :: sdat
+    type(shr_strdata_type)     , intent(inout)    :: sdat
     integer                    , intent(in)    :: logunit
     character(len=*)           , intent(in)    :: compname  !e.g. ATM, OCN, ...
     character(len=*)           , intent(in)    :: nullstr
@@ -255,6 +254,7 @@ contains
     integer                    , intent(out)   :: rc
 
     ! local variables
+    type(ESMF_Grid)                :: model_grid
     type(ESMF_VM)                  :: vm
     logical                        :: mainproc
     type(ESMF_DistGrid)            :: distGrid
@@ -279,6 +279,15 @@ contains
     call ESMF_VMGet(vm, localPet=my_task, rc=rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
     mainproc = (my_task == main_task)
+
+    ! Initialize pio subsystem
+#ifdef CESMCOUPLED
+    sdat%pio_subsystem => shr_pio_getiosys(trim(compname))
+    sdat%io_type       =  shr_pio_getiotype(trim(compname))
+    sdat%io_format     =  shr_pio_getioformat(trim(compname))
+#else
+    call dshr_pio_init(gcomp, sdat, logunit, rc)
+#endif
 
     ! Set restart flag
     call NUOPC_CompAttributeGet(gcomp, name='read_restart', value=cvalue, isPresent=isPresent, isSet=isSet, rc=rc)
@@ -328,8 +337,15 @@ contains
        endif
 
        ! Read in the input model mesh
-       model_mesh = ESMF_MeshCreate(trim(model_meshfile), fileformat=ESMF_FILEFORMAT_ESMFMESH, rc=rc)
-       if (ChkErr(rc,__LINE__,u_FILE_u)) return
+       if (compname == 'OCN' .or. compname == 'ICE') then
+          model_grid = ESMF_GridCreate(filename=trim(model_meshfile),fileformat=ESMF_FILEFORMAT_SCRIP, addCornerStagger=.true., rc=rc)
+          if (ChkErr(rc,__LINE__,u_FILE_u)) return
+          model_mesh = ESMF_MeshCreate(grid=model_grid, rc=rc)
+          if (ChkErr(rc,__LINE__,u_FILE_u)) return
+       else
+          model_mesh = ESMF_MeshCreate(trim(model_meshfile), fileformat=ESMF_FILEFORMAT_ESMFMESH, rc=rc)
+          if (ChkErr(rc,__LINE__,u_FILE_u)) return
+       end if
 
        ! Reset the model mesh mask if the mask file is different from the mesh file
        if (trim(model_meshfile) /= trim(model_maskfile)) then
@@ -1038,6 +1054,7 @@ contains
     integer           :: dimid(1)
     type(var_desc_t)  :: varid
     type(io_desc_t)   :: pio_iodesc
+    integer           :: oldmode 
     integer           :: rcode
     character(*), parameter :: F00   = "('(dshr_restart_write) ',2a,2(i0,2x))"
     !-------------------------------------------------------------------------------
@@ -1058,10 +1075,12 @@ contains
 
     ! write data model restart data
     rcode = pio_createfile(sdat%pio_subsystem, pioid, sdat%io_type, trim(rest_file_model), pio_clobber)
+    rcode = pio_set_fill(pioid, PIO_FILL, oldmode)
     rcode = pio_put_att(pioid, pio_global, "version", "nuopc_data_models_v0")
     if (present(fld) .and. present(fldname)) then
        rcode = pio_def_dim(pioid, 'gsize', sdat%model_gsize, dimid(1))
        rcode = pio_def_var(pioid, trim(fldname), PIO_DOUBLE, dimid, varid)
+       rcode = pio_put_att(pioid, varid, "_FillValue", shr_const_spval)
     endif
     call shr_stream_restIO(pioid, sdat%stream, 'define')
     rcode = pio_enddef(pioid)
@@ -1298,14 +1317,14 @@ contains
   end subroutine dshr_orbital_init
 
   !===============================================================================
-  subroutine dshr_orbital_update(clock, logunit,  maintask, eccen, obliqr, lambm0, mvelpp, rc)
+  subroutine dshr_orbital_update(Time, logunit,  maintask, eccen, obliqr, lambm0, mvelpp, rc)
 
     !----------------------------------------------------------
     ! Update orbital settings
     !----------------------------------------------------------
 
     ! input/output variables
-    type(ESMF_Clock) , intent(in)    :: clock
+    type(ESMF_Time)  , intent(in)    :: Time
     integer          , intent(in)    :: logunit
     logical          , intent(in)    :: maintask
     real(R8)         , intent(inout) :: eccen  ! orbital eccentricity
@@ -1315,7 +1334,6 @@ contains
     integer          , intent(out)   :: rc     ! output error
 
     ! local variables
-    type(ESMF_Time)   :: CurrTime ! current time
     integer           :: year     ! model year at current time
     integer           :: orb_year ! orbital year for current orbital computation
     character(len=CL) :: msgstr   ! temporary
@@ -1325,9 +1343,7 @@ contains
     !-------------------------------------------
 
     if (trim(orb_mode) == trim(orb_variable_year)) then
-       call ESMF_ClockGet(clock, CurrTime=CurrTime, rc=rc)
-       if (chkerr(rc,__LINE__,u_FILE_u)) return
-       call ESMF_TimeGet(CurrTime, yy=year, rc=rc)
+       call ESMF_TimeGet(Time, yy=year, rc=rc)
        if (chkerr(rc,__LINE__,u_FILE_u)) return
        orb_year = orb_iyear + (year - orb_iyear_align)
        lprint = maintask
@@ -1360,7 +1376,7 @@ contains
     use ESMF, only : ESMF_FieldRegridStore, ESMF_FieldRegrid, ESMF_FIELDCREATE
     use ESMF, only : ESMF_REGRIDMETHOD_CONSERVE, ESMF_NORMTYPE_DSTAREA, ESMF_UNMAPPEDACTION_IGNORE
     use ESMF, only : ESMF_TYPEKIND_R8, ESMF_MESHLOC_ELEMENT
-    use ESMF, only : ESMF_RouteHandleDestroy, ESMF_FieldDestroy
+    use ESMF, only : ESMF_RouteHandleDestroy, ESMF_FieldDestroy, ESMF_FieldFill
 
     ! input/out variables
     type(ESMF_Mesh)     , intent(in)  :: mesh_dst
@@ -1391,18 +1407,20 @@ contains
     !-------------------------------------------------------------------------------
 
     rc = ESMF_SUCCESS
-
     mesh_mask = ESMF_MeshCreate(trim(meshfile_mask), fileformat=ESMF_FILEFORMAT_ESMFMESH, rc=rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
 
     call ESMF_MeshGet(mesh_dst, spatialDim=spatialDim, numOwnedElements=lsize_dst, rc=rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
-    allocate(mask_dst(lsize_dst))
-    allocate(frac_dst(lsize_dst))
 
     ! create fields on source and destination meshes
     field_mask = ESMF_FieldCreate(mesh_mask, ESMF_TYPEKIND_R8, meshloc=ESMF_MESHLOC_ELEMENT, rc=rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
+
+    ! Initialize the field_mask, otherwise we sometimes get an error in the FieldRegridStore
+    call ESMF_FieldFill(field_mask, dataFillScheme="const", rc=rc)
+    if (ChkErr(rc,__LINE__,u_FILE_u)) return
+
     field_dst = ESMF_FieldCreate(mesh_dst, ESMF_TYPEKIND_R8, meshloc=ESMF_MESHLOC_ELEMENT, rc=rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
 
@@ -1435,6 +1453,8 @@ contains
     if (chkerr(rc,__LINE__,u_FILE_u)) return
 
     ! now determine mask_dst and frac_dst
+    allocate(mask_dst(lsize_dst))
+    allocate(frac_dst(lsize_dst))
     call ESMF_MeshGet(mesh_dst, spatialDim=spatialDim, rc=rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
     call ESMF_FieldGet(field_dst, farrayptr=dataptr1d, rc=rc)
