@@ -31,6 +31,7 @@ module dshr_mod
   use ESMF             , only : ESMF_TERMORDER_SRCSEQ, ESMF_FieldRegridStore, ESMF_SparseMatrixWrite
   use ESMF             , only : ESMF_Region_Flag, ESMF_REGION_TOTAL, ESMF_MAXSTR, ESMF_RC_NOT_VALID
   use ESMF             , only : ESMF_UtilStringUpperCase
+  use ESMF             , only : ESMF_GridCreate, ESMF_FILEFORMAT_SCRIP
   use shr_kind_mod     , only : r8=>shr_kind_r8, cs=>shr_kind_cs, cl=>shr_kind_cl, cx=>shr_kind_cx, cxx=>shr_kind_cxx, i8=>shr_kind_i8
   use shr_sys_mod      , only : shr_sys_abort
   use shr_mpi_mod      , only : shr_mpi_bcast
@@ -253,6 +254,7 @@ contains
     integer                    , intent(out)   :: rc
 
     ! local variables
+    type(ESMF_Grid)                :: model_grid
     type(ESMF_VM)                  :: vm
     logical                        :: mainproc
     type(ESMF_DistGrid)            :: distGrid
@@ -335,8 +337,15 @@ contains
        endif
 
        ! Read in the input model mesh
-       model_mesh = ESMF_MeshCreate(trim(model_meshfile), fileformat=ESMF_FILEFORMAT_ESMFMESH, rc=rc)
-       if (ChkErr(rc,__LINE__,u_FILE_u)) return
+       if (compname == 'OCN' .or. compname == 'ICE') then
+          model_grid = ESMF_GridCreate(filename=trim(model_meshfile),fileformat=ESMF_FILEFORMAT_SCRIP, addCornerStagger=.true., rc=rc)
+          if (ChkErr(rc,__LINE__,u_FILE_u)) return
+          model_mesh = ESMF_MeshCreate(grid=model_grid, rc=rc)
+          if (ChkErr(rc,__LINE__,u_FILE_u)) return
+       else
+          model_mesh = ESMF_MeshCreate(trim(model_meshfile), fileformat=ESMF_FILEFORMAT_ESMFMESH, rc=rc)
+          if (ChkErr(rc,__LINE__,u_FILE_u)) return
+       end if
 
        ! Reset the model mesh mask if the mask file is different from the mesh file
        if (trim(model_meshfile) /= trim(model_maskfile)) then
