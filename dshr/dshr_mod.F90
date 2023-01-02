@@ -198,11 +198,11 @@ contains
 #ifdef CESMCOUPLED
     call set_component_logging(gcomp, my_task == main_task, logunit, slogunit, rc=rc)
 #else
-    if (my_task == main_task) then 
+    if (my_task == main_task) then
        call ESMF_LogWrite(trim(subname)//' : output logging is written to '//trim(diro)//"/"//trim(logfile), ESMF_LOGMSG_INFO)
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
        open(newunit=logunit, file=trim(diro)//"/"//trim(logfile))
-       
+
     else
        logUnit = 6
     endif
@@ -262,11 +262,15 @@ contains
     real(r8)                       :: scol_lon
     real(r8)                       :: scol_lat
     character(CL)                  :: cvalue
-    integer                        :: lsize      ! local size of mesh
+    integer                        :: lsize            ! local size of mesh
     type(ESMF_Array)               :: elemMaskArray
     logical                        :: isPresent, isSet
-    logical                        :: exists     ! check for file existence
+    logical                        :: exists           ! check for file existence
     real(r8)                       :: scol_spval = -999._r8
+    type(file_desc_t)              :: pioid            ! needed to check mesh format
+    integer                        :: dimid            ! needed to check mesh format
+    integer                        :: rcode            ! needed to check mesh format
+    integer                        :: old_error_handle ! needed to check mesh format
     character(*)    , parameter    :: F00 ="('(dshr_mesh_init) ',a)"
     character(len=*), parameter    :: subname='(dshr_mod:dshr_mesh_init)'
     ! ----------------------------------------------
@@ -337,15 +341,31 @@ contains
        endif
 
        ! Read in the input model mesh
-       if (compname == 'OCN' .or. compname == 'ICE') then
-          model_grid = ESMF_GridCreate(filename=trim(model_meshfile),fileformat=ESMF_FILEFORMAT_SCRIP, addCornerStagger=.true., rc=rc)
-          if (ChkErr(rc,__LINE__,u_FILE_u)) return
-          model_mesh = ESMF_MeshCreate(grid=model_grid, rc=rc)
-          if (ChkErr(rc,__LINE__,u_FILE_u)) return
-       else
+       rcode = pio_openfile(sdat%pio_subsystem, pioid, sdat%io_type, trim(model_meshfile), pio_nowrite)
+       call PIO_seterrorhandling(pioid, PIO_BCAST_ERROR, old_error_handle)
+       rcode = pio_inq_dimid (pioid, 'elementCount', dimid) ! Mesh format
+       if (rcode == PIO_NOERR) then
+          if (my_task == main_task) then
+             write(logunit, F00) ' input mesh format for '//trim(compname)//' is ESMF_FILEFORMAT_MESH'
+          end if
           model_mesh = ESMF_MeshCreate(trim(model_meshfile), fileformat=ESMF_FILEFORMAT_ESMFMESH, rc=rc)
           if (ChkErr(rc,__LINE__,u_FILE_u)) return
+       else
+          rcode = pio_inq_dimid (pioid, 'grid_size', dimid)  ! SCRIP format
+          if (rcode == PIO_NOERR) then
+             if (my_task == main_task) then
+                write(logunit, F00) ' input mesh format for '//trim(compname)//' is ESMF_FILEFORMAT_SCRIP'
+             end if
+             model_grid = ESMF_GridCreate(filename=trim(model_meshfile),fileformat=ESMF_FILEFORMAT_SCRIP, addCornerStagger=.true., rc=rc)
+             if (ChkErr(rc,__LINE__,u_FILE_u)) return
+             model_mesh = ESMF_MeshCreate(grid=model_grid, rc=rc)
+             if (ChkErr(rc,__LINE__,u_FILE_u)) return
+          else
+             call shr_sys_abort('ERROR: input mesh must either have ESMF_FILEFORMAT_ESMFMESH or ESMF_FILEFORMAT_SCRIP')
+          end if
        end if
+       call PIO_seterrorhandling(pioid, old_error_handle)
+       call pio_closefile(pioid)
 
        ! Reset the model mesh mask if the mask file is different from the mesh file
        if (trim(model_meshfile) /= trim(model_maskfile)) then
@@ -1054,7 +1074,7 @@ contains
     integer           :: dimid(1)
     type(var_desc_t)  :: varid
     type(io_desc_t)   :: pio_iodesc
-    integer           :: oldmode 
+    integer           :: oldmode
     integer           :: rcode
     character(*), parameter :: F00   = "('(dshr_restart_write) ',2a,2(i0,2x))"
     !-------------------------------------------------------------------------------
@@ -1908,7 +1928,7 @@ contains
 
   end subroutine dshr_pio_init
 !
-! Returns trun if the restart alarm is ringing or its the end of the run and 
+! Returns trun if the restart alarm is ringing or its the end of the run and
 ! REST_OPTION is not none or never
 !
   logical function dshr_check_restart_alarm(clock, rc)
@@ -1923,10 +1943,10 @@ contains
     !--------------------------------
 
     rc = ESMF_SUCCESS
-    
+
     call ESMF_ClockGetAlarm(clock, alarmname='alarm_stop', alarm=alarm, rc=rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
-    
+
     if (ESMF_AlarmIsRinging(alarm, rc=rc)) then
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
        nlend = .true.
@@ -1945,7 +1965,7 @@ contains
     else
        call ESMF_ClockGetAlarm(clock, alarmname='alarm_restart', alarm=alarm, rc=rc)
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
-       
+
        if (ESMF_AlarmIsRinging(alarm, rc=rc)) then
           if (ChkErr(rc,__LINE__,u_FILE_u)) return
           rstwr = .true.
@@ -1958,5 +1978,5 @@ contains
     dshr_check_restart_alarm = rstwr
   end function dshr_check_restart_alarm
 
-  
+
 end module dshr_mod
