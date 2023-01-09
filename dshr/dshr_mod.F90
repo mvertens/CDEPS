@@ -111,6 +111,7 @@ contains
 #ifdef CESMCOUPLED
     use nuopc_shr_methods, only : set_component_logging
 #endif
+
     ! input/output variables
     type(ESMF_GridComp)                   :: gcomp
     type(shr_strdata_type), intent(in) :: sdat   ! No longer used
@@ -239,7 +240,7 @@ contains
 
     ! input/output variables
     type(ESMF_GridComp)        , intent(inout) :: gcomp
-    type(shr_strdata_type)     , intent(inout)    :: sdat
+    type(shr_strdata_type)     , intent(inout) :: sdat
     integer                    , intent(in)    :: logunit
     character(len=*)           , intent(in)    :: compname  !e.g. ATM, OCN, ...
     character(len=*)           , intent(in)    :: nullstr
@@ -372,7 +373,8 @@ contains
 
           ! obtain the model mask by mapping the mesh created by reading in the model_maskfile to the
           ! model mesh and then reset the model mesh mask
-          call dshr_set_modelmask(model_mesh, model_maskfile, compname, model_mask, model_frac, rc=rc)
+          call dshr_set_modelmask(sdat, model_mesh, model_maskfile, compname, logunit, mainproc, &
+               model_mask, model_frac, rc=rc)
           if (ChkErr(rc,__LINE__,u_FILE_u)) return
 
           if (mainproc) then
@@ -1391,7 +1393,7 @@ contains
   end subroutine dshr_orbital_update
 
   !===============================================================================
-  subroutine dshr_set_modelmask(mesh_dst, meshfile_mask, compname, mask_dst, frac_dst, rc)
+  subroutine dshr_set_modelmask(sdat, mesh_dst, maskfile, compname, logunit, mainproc, mask_dst, frac_dst, rc)
 
     use ESMF, only : ESMF_FieldRegridStore, ESMF_FieldRegrid, ESMF_FIELDCREATE
     use ESMF, only : ESMF_REGRIDMETHOD_CONSERVE, ESMF_NORMTYPE_DSTAREA, ESMF_UNMAPPEDACTION_IGNORE
@@ -1399,15 +1401,19 @@ contains
     use ESMF, only : ESMF_RouteHandleDestroy, ESMF_FieldDestroy, ESMF_FieldFill
 
     ! input/out variables
-    type(ESMF_Mesh)     , intent(in)  :: mesh_dst
-    character(len=*)    , intent(in)  :: meshfile_mask
-    character(len=*)    , intent(in)  :: compname
-    integer , pointer   , intent(out) :: mask_dst(:)
-    real(r8), pointer   , intent(out) :: frac_dst(:)
-    integer             , intent(out) :: rc
+    type(shr_strdata_type) , intent(inout) :: sdat
+    type(ESMF_Mesh)        , intent(in)    :: mesh_dst
+    character(len=*)       , intent(in)    :: maskfile
+    character(len=*)       , intent(in)    :: compname
+    integer                , intent(in)    :: logunit 
+    logical                , intent(in)    :: mainproc
+    integer  , pointer     , intent(out)   :: mask_dst(:)
+    real(r8) , pointer     , intent(out)   :: frac_dst(:)
+    integer                , intent(out)   :: rc
 
     ! local variables:
     type(ESMF_Mesh)        :: mesh_mask
+    type(ESMF_Grid)        :: grid_mask
     type(ESMF_Field)       :: field_mask
     type(ESMF_Field)       :: field_dst
     type(ESMF_RouteHandle) :: rhandle
@@ -1415,7 +1421,7 @@ contains
     integer                :: dstMaskValue = -987987 ! spval for RH mask values
     integer                :: srcTermProcessing_Value = 0
     logical                :: checkflag = .false.
-    real(r8) , pointer     :: mask_src(:) ! on mesh created from meshfile_mask
+    real(r8) , pointer     :: mask_src(:) ! on mesh created from file_mask
     real(r8) , pointer     :: dataptr1d(:)
     type(ESMF_DistGrid)    :: distgrid_mask
     type(ESMF_Array)       :: elemMaskArray
@@ -1424,12 +1430,43 @@ contains
     real(r8)               :: fminval = 0.001_r8
     real(r8)               :: fmaxval = 1._r8
     real(r8)               :: lfrac,ofrac
+    type(file_desc_t)      :: pioid            ! needed to check mesh format
+    integer                :: dimid            ! needed to check mesh format
+    integer                :: rcode            ! needed to check mesh format
+    integer                :: old_error_handle ! needed to check mesh format
+    character(*), parameter :: F00 ="('(dshr_set_modelmask) ',a)"
     !-------------------------------------------------------------------------------
 
     rc = ESMF_SUCCESS
-    mesh_mask = ESMF_MeshCreate(trim(meshfile_mask), fileformat=ESMF_FILEFORMAT_ESMFMESH, rc=rc)
-    if (ChkErr(rc,__LINE__,u_FILE_u)) return
 
+    ! Read in the input mask
+    rcode = pio_openfile(sdat%pio_subsystem, pioid, sdat%io_type, trim(maskfile), pio_nowrite)
+    call PIO_seterrorhandling(pioid, PIO_BCAST_ERROR, old_error_handle)
+    rcode = pio_inq_dimid (pioid, 'elementCount', dimid) ! Mesh format
+    if (rcode == PIO_NOERR) then
+       if (mainproc) then
+          write(logunit, F00) ' input mesh format for '//trim(compname)//' is ESMF_FILEFORMAT_MESH'
+       end if
+       mesh_mask = ESMF_MeshCreate(trim(maskfile), fileformat=ESMF_FILEFORMAT_ESMFMESH, rc=rc)
+       if (ChkErr(rc,__LINE__,u_FILE_u)) return
+    else
+       rcode = pio_inq_dimid (pioid, 'grid_size', dimid)  ! SCRIP format
+       if (rcode == PIO_NOERR) then
+          if (mainproc) then
+             write(logunit, F00) ' input mask format for '//trim(compname)//' is ESMF_FILEFORMAT_SCRIP'
+          end if
+          grid_mask = ESMF_GridCreate(filename=trim(maskfile), fileformat=ESMF_FILEFORMAT_SCRIP, addCornerStagger=.true., rc=rc)
+          if (ChkErr(rc,__LINE__,u_FILE_u)) return
+          mesh_mask = ESMF_MeshCreate(grid=grid_mask, rc=rc)
+          if (ChkErr(rc,__LINE__,u_FILE_u)) return
+       else
+          call shr_sys_abort('ERROR: input mesh must either have ESMF_FILEFORMAT_ESMFMESH or ESMF_FILEFORMAT_SCRIP')
+       end if
+    end if
+    call PIO_seterrorhandling(pioid, old_error_handle)
+    call pio_closefile(pioid)
+
+    ! Get information about the model mesh
     call ESMF_MeshGet(mesh_dst, spatialDim=spatialDim, numOwnedElements=lsize_dst, rc=rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
 
@@ -1517,6 +1554,7 @@ contains
 
   end subroutine dshr_set_modelmask
 
+  !===============================================================================
   subroutine dshr_pio_init(gcomp, sdat, logunit, rc)
 
     ! ----------------------------------------------
@@ -1927,10 +1965,12 @@ contains
                              pio_rearr_comm_max_pend_req_io2comp)
 
   end subroutine dshr_pio_init
-!
-! Returns trun if the restart alarm is ringing or its the end of the run and
-! REST_OPTION is not none or never
-!
+
+  !===============================================================================
+  !
+  ! Returns trun if the restart alarm is ringing or its the end of the run and
+  ! REST_OPTION is not none or never
+  !
   logical function dshr_check_restart_alarm(clock, rc)
     use ESMF, only : ESMF_ClockGetAlarm, ESMF_AlarmIsRinging, ESMF_AlarmRingerOff
     integer, intent(out)         :: rc
