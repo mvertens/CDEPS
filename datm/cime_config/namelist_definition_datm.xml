@@ -73,6 +73,9 @@
       <value datm_mode="CPLHIST">
         CPLHISTForcing.Solar,CPLHISTForcing.nonSolarFlux,CPLHISTForcing.State3hr,CPLHISTForcing.State1hr
       </value>
+      <value datm_mode="DOTPaleo34MA">
+        DOTPaleo34MA
+      </value>
     </values>
   </entry>
 
@@ -80,7 +83,7 @@
     <type>char</type>
     <category>datm</category>
     <group>datm_nml</group>
-    <valid_values>CLMNCEP,CORE2_NYF,CORE2_IAF,CORE_IAF_JRA,ERA5,CPLHIST,1PT</valid_values>
+    <valid_values>CLMNCEP,CORE2_NYF,CORE2_IAF,CORE_IAF_JRA,ERA5,CPLHIST,1PT,DOTPaleo34MA</valid_values>
     <desc>
       general method that operates on the data.
       ----datamode = "CPLHIST"----
@@ -131,6 +134,9 @@
       </value>
       <value datm_mode="ERA5">
         ERA5
+      </value>
+      <value datm_mode="DOTPaleo34MA">
+        DOTPaleo34MA
       </value>
       <value datm_mode="CPLHIST">
         CPLHIST
