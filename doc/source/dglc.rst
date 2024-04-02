@@ -101,17 +101,19 @@ DGLC%NOEVOLVE
 
 In addition, the following DGLC specific CIME-CCS xml variables will appear in ``$CASEROOT/env_run.xml``:
 
-DGLC_USE_GREENLAND
+GLC_USE_GREENLAND
    - Whether to include the Greenland Ice Sheet in this DGLC simulation
      This should generally be set at create_newcase time (via the compset). In principle it
      can be changed later, but great care is needed to change a number of other variables
      to be consistent (GLC_GRID, GLC_DOMAIN_MESH and possibly others).
+     This flag is not used directly by DGLC but is used by CTSM.
 
-DGLC_USE_ANTARCTICA
+GLC_USE_ANTARCTICA
    - Whether to include the Antarctic Ice Sheet in this DGLC simulation
      This should generally be set at create_newcase time (via the compset). In principle it
      can be changed later, but great care is needed to change a number of other variables
      to be consistent (GLC_GRID, GLC_DOMAIN_MESH and possibly others).
+     This flag is not used directly by DGLC but is used by CTSM.
 
 DGLC_SKIP_RESTART_READ
    - If set to true, than dglc restarts will not be read on a continuation run.
