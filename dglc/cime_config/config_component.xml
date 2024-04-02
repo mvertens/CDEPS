@@ -43,13 +43,13 @@
     </desc>
   </entry>
 
-  <entry id="DGLC_USE_GREENLAND">
+  <entry id="GLC_USE_GREENLAND">
     <type>logical</type>
     <default_value>FALSE</default_value>
     <group>run_component_dglc</group>
     <file>env_run.xml</file>
     <values>
-      <value grid="g%.*gris.*">TRUE</value>
+      <value grid="g%[^_]*gris.*">TRUE</value>
     </values>
     <desc>Whether to include the Greenland Ice Sheet in this DGLC simulation
     This should generally be set at create_newcase time (via the compset). In principle it
@@ -58,13 +58,13 @@
     </desc>
   </entry>
 
-  <entry id="DGLC_USE_ANTARCTICA">
+  <entry id="GLC_USE_ANTARCTICA">
     <type>logical</type>
     <default_value>FALSE</default_value>
     <group>run_component_dglc</group>
     <file>env_run.xml</file>
     <values>
-      <value grid="g%.*ais.*">TRUE</value>
+      <value grid="g%[^_]*ais.*">TRUE</value>
     </values>
     <desc>Whether to include the Antarctica Ice Sheet in this DGLC simulation
     This should generally be set at create_newcase time (via the compset). In principle it
