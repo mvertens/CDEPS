@@ -3089,27 +3089,6 @@
     <stream_datavars>
       <var>u10   Sa_u10m</var>
       <var>v10   Sa_v10m</var>
-      <var>t2m   Sa_t2m</var>
-      <var>skt   Sa_tskn</var>
-      <var>d2m   Sa_tdew</var>
-      <var>msl   Sa_pslv</var>
-      <var>tp    Faxa_rain</var>
-      <var>cp    Faxa_rainc</var>
-      <var>lsp   Faxa_rainl</var>
-      <var>csf   Faxa_snowc</var>
-      <var>lsf   Faxa_snowl</var>
-      <var>ssrd  Faxa_swdn</var>
-      <var>ssr   Faxa_swnet</var>
-      <var>strd  Faxa_lwdn</var>
-      <var>str   Faxa_lwnet</var>
-      <var>aluvp Faxa_swvdr</var>
-      <var>aluvd Faxa_swvdf</var>
-      <var>alnip Faxa_swndr</var>
-      <var>alnid Faxa_swndf</var>
-      <var>sshf  Faxa_sen</var>
-      <var>slhf  Faxa_lat</var>
-      <var>ewss  Faxa_taux</var>
-      <var>nsss  Faxa_tauy</var>
     </stream_datavars>
     <stream_lev_dimname>null</stream_lev_dimname>
     <stream_mapalgo>

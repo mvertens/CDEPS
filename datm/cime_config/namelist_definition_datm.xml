@@ -133,7 +133,7 @@
         CORE_IAF_JRA
       </value>
       <value datm_mode="ERA5">
-        ERA5
+        copyall
       </value>
       <value datm_mode="SIMPLE">
         SIMPLE
