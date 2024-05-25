@@ -307,6 +307,7 @@
     </desc>
     <values>
       <value>.true.</value>
+      <value datm_mode="CPLHIST">.true.</value>
       <value datm_co2_tseries="none">.false.</value>
     </values>
   </entry>

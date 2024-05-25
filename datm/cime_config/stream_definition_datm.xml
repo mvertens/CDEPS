@@ -3089,13 +3089,34 @@
     <stream_datavars>
       <var>u10   Sa_u10m</var>
       <var>v10   Sa_v10m</var>
+      <var>t2m   Sa_t2m</var>
+      <var>skt   Sa_tskn</var>
+      <var>d2m   Sa_tdew</var>
+      <var>msl   Sa_pslv</var>
+      <var>tp    Faxa_rain</var>
+      <var>cp    Faxa_rainc</var>
+      <var>lsp   Faxa_rainl</var>
+      <var>csf   Faxa_snowc</var>
+      <var>lsf   Faxa_snowl</var>
+      <var>ssrd  Faxa_swdn</var>
+      <var>ssr   Faxa_swnet</var>
+      <var>strd  Faxa_lwdn</var>
+      <var>str   Faxa_lwnet</var>
+      <var>aluvp Faxa_swvdr</var>
+      <var>aluvd Faxa_swvdf</var>
+      <var>alnip Faxa_swndr</var>
+      <var>alnid Faxa_swndf</var>
+      <var>sshf  Faxa_sen</var>
+      <var>slhf  Faxa_lat</var>
+      <var>ewss  Faxa_taux</var>
+      <var>nsss  Faxa_tauy</var>
     </stream_datavars>
     <stream_lev_dimname>null</stream_lev_dimname>
     <stream_mapalgo>
       <mapalgo>bilinear</mapalgo>
     </stream_mapalgo>
     <!-- <stream_vectors>u:v taux:tauy</stream_vectors> -->
-    <stream_vectors>null</stream_vectors>
+    <stream_vectors>u:v</stream_vectors>
     <stream_year_align>2019</stream_year_align>
     <stream_year_first>2019</stream_year_first>
     <stream_year_last>2019</stream_year_last>
@@ -4591,19 +4612,61 @@
   </stream_entry>
 
   <!-- ===================-->
-  <!--  cplhist forcing streams -->
+  <!--  cplhist optional forcing streams -->
   <!-- ===================-->
+
+  <stream_entry name="topo.cplhist">
+    <stream_meshfile>
+      <meshfile>$ATM_DOMAIN_MESH</meshfile>
+    </stream_meshfile>
+    <stream_datafiles>
+      <file first_year="$DATM_YR_START" last_year="$DATM_YR_END">$DATM_CPLHIST_DIR/$DATM_CPLHIST_CASE.cpl.hx.atm.3h.avrg.%ymd-10800.nc</file>
+    </stream_datafiles>
+    <stream_datavars>
+      <var>atmImp_Sa_topo  Sa_topo</var>
+    </stream_datavars>
+    <stream_lev_dimname>null</stream_lev_dimname>
+    <stream_mapalgo>
+      <mapalgo>bilinear</mapalgo>
+    </stream_mapalgo>
+    <stream_vectors>null</stream_vectors>
+    <stream_year_align>$DATM_YR_ALIGN</stream_year_align>
+    <stream_year_first>$DATM_YR_START</stream_year_first>
+    <stream_year_last>$DATM_YR_END</stream_year_last>
+    <stream_offset>0</stream_offset>
+    <stream_tintalgo>
+      <tintalgo>nearest</tintalgo>
+    </stream_tintalgo>
+    <stream_taxmode>
+      <taxmode>cycle</taxmode>
+    </stream_taxmode>
+    <stream_dtlimit>
+      <dtlimit>3.0</dtlimit>
+    </stream_dtlimit>
+  <stream_readmode>single</stream_readmode></stream_entry>
 
   <stream_entry name="presaero.cplhist">
     <stream_meshfile>
       <meshfile>$ATM_DOMAIN_MESH</meshfile>
     </stream_meshfile>
     <stream_datafiles>
-      <file first_year="$DATM_YR_START" last_year="$DATM_YR_END" filename_advance_days='1'>$DATM_CPLHIST_DIR/$DATM_CPLHIST_CASE.cpl.ha2x1d.%ym.nc</file>
+      <file first_year="$DATM_YR_START" last_year="$DATM_YR_END" filename_advance_days='1'>$DATM_CPLHIST_DIR/$DATM_CPLHIST_CASE.cpl.hx.atm.24h.avrg.%ymd-00000.nc</file>
     </stream_datafiles>
     <stream_datavars>
-      <var>a2x1d_Sa_co2diag Sa_co2diag</var>
-      <var>a2x1d_Sa_co2prog Sa_co2prog</var>
+      <var>atmImp_Faxa_bcph1 Faxa_bcphidry</var>
+      <var>atmImp_Faxa_bcph2 Faxa_bcphodry</var>
+      <var>atmImp_Faxa_bcph3 Faxa_bcphiwet</var>
+      <var>atmImp_Faxa_ocph1 Faxa_ocphidry</var>
+      <var>atmImp_Faxa_ocph2 Faxa_ocphodry</var>
+      <var>atmImp_Faxa_ocph3 Faxa_ocphiwet</var>
+      <var>atmImp_Faxa_dstwet1 Faxa_dstwet1</var>
+      <var>atmImp_Faxa_dstdry1 Faxa_dstdry1</var>
+      <var>atmImp_Faxa_dstwet2 Faxa_dstwet2</var>
+      <var>atmImp_Faxa_dstdry2 Faxa_dstdry2</var>
+      <var>atmImp_Faxa_dstwet3 Faxa_dstwet3</var>
+      <var>atmImp_Faxa_dstdry3 Faxa_dstdry3</var>
+      <var>atmImp_Faxa_dstwet4 Faxa_dstwet4</var>
+      <var>atmImp_Faxa_dstdry4 Faxa_dstdry4</var>
     </stream_datavars>
     <stream_lev_dimname>null</stream_lev_dimname>
     <stream_mapalgo>
@@ -4626,6 +4689,41 @@
     <stream_readmode>single</stream_readmode>
   </stream_entry>
 
+  <stream_entry name="presndep.cplhist">
+    <stream_meshfile>
+      <meshfile>$ATM_DOMAIN_MESH</meshfile>
+    </stream_meshfile>
+    <stream_datafiles>
+      <file first_year="$DATM_YR_START" last_year="$DATM_YR_END">$DATM_CPLHIST_DIR/$DATM_CPLHIST_CASE.cpl.ha2x1d.%ym.nc</file>
+    </stream_datafiles>
+    <stream_datavars>
+      <var>a2x1d_Faxa_ndep  Faxa_ndep</var>
+    </stream_datavars>
+    <stream_lev_dimname>null</stream_lev_dimname>
+    <stream_mapalgo>
+      <mapalgo>bilinear</mapalgo>
+    </stream_mapalgo>
+    <stream_vectors>null</stream_vectors>
+    <stream_year_align>$DATM_YR_ALIGN</stream_year_align>
+    <stream_year_first>$DATM_YR_START</stream_year_first>
+    <stream_year_last>$DATM_YR_END</stream_year_last>
+    <stream_offset>0</stream_offset>
+    <stream_tintalgo>
+      <tintalgo>nearest</tintalgo>
+    </stream_tintalgo>
+    <stream_taxmode>
+      <taxmode>cycle</taxmode>
+    </stream_taxmode>
+    <stream_dtlimit>
+      <dtlimit>3.0</dtlimit>
+    </stream_dtlimit>
+    <stream_readmode>single</stream_readmode>
+  </stream_entry>
+
+  <!-- ===================-->
+  <!--  cplhist non-optional forcing streams -->
+  <!-- CPLHISTForcing.Solar,CPLHISTForcing.nonSolarFlux,CPLHISTForcing.State3hr,CPLHISTForcing.State1hr -->
+  <!-- ===================-->
 
   <stream_entry name="CPLHISTForcing.Solar">
     <stream_meshfile>
@@ -4666,7 +4764,6 @@
       <meshfile>$ATM_DOMAIN_MESH</meshfile>
     </stream_meshfile>
     <stream_datafiles>
-
       <file first_year="$DATM_YR_START" last_year="$DATM_YR_END">$DATM_CPLHIST_DIR/$DATM_CPLHIST_CASE.cpl.ha2x3h.%ym.nc</file>
     </stream_datafiles>
     <stream_datavars>
@@ -4712,6 +4809,8 @@
       <var>a2x3h_Sa_pbot    Sa_pbot</var>
       <var>a2x3h_Sa_dens    Sa_dens</var>
       <var>a2x3h_Sa_pslv    Sa_pslv</var>
+      <var>a2x3h_Sa_co2diag Sa_co2diag</var>
+      <var>a2x3h_Sa_co2prog Sa_co2prog</var>
     </stream_datavars>
     <stream_lev_dimname>null</stream_lev_dimname>
     <stream_mapalgo>
@@ -4767,7 +4866,7 @@
   </stream_entry>
 
   <!-- ===================-->
-  <!-- topo streams -->
+  <!-- optinoal observed topo streams -->
   <!-- ===================-->
 
   <stream_entry name="topo.observed">
