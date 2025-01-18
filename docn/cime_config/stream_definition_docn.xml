@@ -180,7 +180,7 @@
       <meshfile>$OCN_DOMAIN_MESH</meshfile>
     </stream_meshfile>
     <stream_datafiles>
-      <file first_year="0" last_year="99999">$DOCN_CPLHIST_DIR/$DOCN_CPLHIST_CASE.cpl.hx.ocn2glc.%y-01-01-00000.nc</file>
+      <file first_year="0" last_year="99999">$DOCN_CPLHIST_DIR/$DOCN_CPLHIST_FILENAMES</file>
    </stream_datafiles>
     <stream_datavars>
       <var>ocnImp_So_s_depth1    So_s_depth1</var>

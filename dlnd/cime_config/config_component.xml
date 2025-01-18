@@ -54,15 +54,16 @@
     <desc>directory for coupler history data mode (only used for CPLHIST mode)</desc>
   </entry>
 
-  <entry id="DLND_CPLHIST_CASE">
+  <entry id="DLND_CPLHIST_FILENAMES">
     <type>char</type>
     <default_value>UNSET</default_value>
     <values match="last">
-      <value compset="1850.*_DLND%SCPL" grid="l%0.9x1.25">b.e21.B1850.f09_g17.CMIP6-piControl.001</value>
+      <value compset="1850.*_DLND%SCPL" grid="l%0.9x1.25">b.e21.B1850.f09_g17.CMIP6-piControl.001.cpl.hl2x1yr_glc.%y-01-01.nc</value>
     </values>
     <group>run_component_dlnd</group>
     <file>env_run.xml</file>
-    <desc>case name for coupler history data mode (only used for CPLHIST mode)</desc>
+    <desc>file names descriptor for coupler history data mode only -
+    (.e.g. $CASENAME.cpl.hx.lndglc.%y-01-01-00000.nc)</desc>
   </entry>
 
   <entry id="DLND_CPLHIST_YR_ALIGN">
