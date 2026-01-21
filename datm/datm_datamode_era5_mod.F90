@@ -45,11 +45,18 @@ module datm_datamode_era5_mod
   real(r8), pointer :: Faxa_taux(:)         => null()
   real(r8), pointer :: Faxa_tauy(:)         => null()
 
-  ! stream data
-  real(r8), pointer :: strm_Sa_tdew(:)    => null()
+  ! stream data emc
+  real(r8), pointer :: strm_Sa_z(:)            => null() ! optional
+  real(r8), pointer :: strm_Sa_tdew(:)         => null() ! optional
+  real(r8), pointer :: strm_Sa_wind(:)         => null() ! optional
+  real(r8), pointer :: strm_Sa_wind10m(:)      => null() !?
+  real(r8), pointer :: strm_Sa_u(:)            => null() !?
+  real(r8), pointer :: strm_Sa_v(:)            => null() !?
+  real(r8), pointer :: strm_Sa_u10m(:)         => null()
+  real(r8), pointer :: strm_Sa_v10m(:)         => null()
+
+  ! stream data ncar?
   real(r8), pointer :: strm_Sa_t2m(:)     => null()
-  real(r8), pointer :: strm_Sa_u10m(:)    => null()
-  real(r8), pointer :: strm_Sa_v10m(:)    => null()
   real(r8), pointer :: strm_Sa_pslv(:)    => null()
   real(r8), pointer :: strm_Faxa_swdn(:)  => null()
   real(r8), pointer :: strm_Faxa_swvdr(:) => null()
@@ -238,76 +245,60 @@ contains
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
 
     ! Error checks
-    if (.not. associated(strm_Sa_tdew)) then
-       call shr_log_error(subname//'ERROR: strm_Sa_tdew must be associated for era5 datamode')
+    if (.not. associated(strm_Sa_u10m) .and. .not. associated(strm_Sa_v10m) then
+       call shr_log_error(subname//'ERROR: strm_Sa_u10m .and. strm_Sa_v10m must be associated for era5 datamode', rc=rc)
        return
     end if
 
-    if (associated(Sa_wspd10m) .and. .not. associated(strm_Sa_u10m)) then
-       call shr_log_error(subname//'ERROR: strm_Sa_u10m must be associated for era5 datamode', rc=rc)
-       return
-    end if
-    if (associated(Sa_wspd10m) .and. .not. associated(strm_Sa_v10m)) then
-       call shr_log_error(subname//'ERROR: strm_Sa_v10m must be associated for era5 datamode', rc=rc)
-       return
-    end if
-    if (associated(Sa_t2m) .and. .not. associated(strm_Sa_t2m)) then
+    if (.not. associated(strm_Sa_t2m)) then
        call shr_log_error(subname//'ERROR: strm_Sa_t2m must be associated for era5 datamode', rc=rc)
        return
     end if
-    if (associated(Sa_t2m) .and. associated(Sa_pslv) .and. associated(Sa_q2m) .and. .not. associated(strm_Sa_pslv)) then
+    if (.not. associated(strm_Sa_pslv)) then
        call shr_log_error(subname//'ERROR: strm_Sa_pslv must be associated for era5 datamode', rc=rc)
        return
     end if
-    if (associated(Faxa_swdn)) then
-       if (.not. associated(strm_Faxa_swdn)) then
-          call shr_log_error(subname//'ERROR: strm_Faxa_swdn must be associated for era5 datamode', rc=rc)
-          return
-       end if
+    if (.not. associated(strm_Faxa_swdn)) then
+       call shr_log_error(subname//'ERROR: strm_Faxa_swdn must be associated for era5 datamode', rc=rc)
+       return
     end if
-    if ( associated(Faxa_swvdr) .or. associated(Faxa_swndr) .or. associated(Faxa_swvdf) .or. associated(Faxa_swndf)) then
-       if (.not. associated(strm_Faxa_swdn)) then
-          call shr_log_error(subname//'ERROR: strm_Faxa_swdn must be associated for era5 datamode', rc=rc)
-          return
-       end if
-    end if
-    if (associated(Faxa_swvdr) .and. .not. associated(strm_Faxa_swvdr)) then
+    if (.not. associated(strm_Faxa_swvdr)) then
        call shr_log_error(subname//'ERROR: strm_Faxa_swvdr must be associated for era5 datamode', rc=rc)
        return
     end if
-    if (associated(Faxa_swndr) .and. .not. associated(strm_Faxa_swndr)) then
+    if (.not. associated(strm_Faxa_swndr)) then
        call shr_log_error(subname//'ERROR: strm_Faxa_swndr must be associated for era5 datamode', rc=rc)
        return
     end if
-    if (associated(Faxa_swvdf) .and. .not. associated(strm_Faxa_swvdf)) then
+    if (.not. associated(strm_Faxa_swvdf)) then
        call shr_log_error(subname//'ERROR: strm_Faxa_swvdf must be associated for era5 datamode', rc=rc)
        return
     end if
-    if (associated(Faxa_swndf) .and. .not. associated(strm_Faxa_swndf)) then
+    if (.not. associated(strm_Faxa_swndf)) then
        call shr_log_error(subname//'ERROR: strm_Faxa_swndf must be associated for era5 datamode', rc=rc)
        return
     end if
-    if (associated(Faxa_lwdn) .and. .not. associated(strm_Faxa_lwdn)) then
+    if (.not. associated(strm_Faxa_lwdn)) then
        call shr_log_error(subname//'ERROR: strm_Faxa_lwdn must be associated for era5 datamode', rc=rc)
        return
     end if
-    if (associated(Faxa_lwnet) .and. .not. associated(strm_Faxa_lwnet)) then
+    if (.not. associated(strm_Faxa_lwnet)) then
        call shr_log_error(subname//'ERROR: strm_Faxa_lwnet must be associated for era5 datamode', rc=rc)
        return
     end if
-    if (associated(Faxa_swnet) .and. .not. associated(strm_Faxa_swnet)) then
+    if (.not. associated(strm_Faxa_swnet)) then
        call shr_log_error(subname//'ERROR: strm_Faxa_swnet must be associated for era5 datamode', rc=rc)
        return
     end if
-    if (associated(Faxa_sen) .and. .not. associated(strm_Faxa_sen)) then
+    if (.not. associated(strm_Faxa_sen)) then
        call shr_log_error(subname//'ERROR: strm_Faxa_sen must be associated for era5 datamode', rc=rc)
        return
     end if
-    if (associated(Faxa_lat) .and. .not. associated(strm_Faxa_lat)) then
+    if (associated(strm_Faxa_lat)) then
        call shr_log_error(subname//'ERROR: strm_Faxa_lat must be associated for era5 datamode', rc=rc)
        return
     end if
-    if (associated(Faxa_rain) .and. .not. associated(strm_Faxa_rain)) then
+    if (.not. associated(strm_Faxa_rain)) then
        call shr_log_error(subname//'ERROR: strm_Faxa_rain must be associated for era5 datamode', rc=rc)
        return
     end if
@@ -362,18 +353,16 @@ contains
 
     rc = ESMF_SUCCESS
 
-    lsize = size(strm_Sa_tdew)
+    lsize = size(Sa_z)
     if (first_time) then
        call ESMF_VMGetCurrent(vm, rc=rc)
-       ! determine t2max (see below for use)
-       if (associated(Sa_t2m)) then
-         Sa_t2m(:) = strm_Sa_t2m(:)
-         rtmp(1) = maxval(Sa_t2m(:))
 
-         call ESMF_VMAllReduce(vm, rtmp, rtmp(2:), 1, ESMF_REDUCE_MAX, rc=rc)
-         t2max = rtmp(2)
-         if (mainproc) write(logunit,*) subname,' t2max = ',t2max
-       end if
+       ! determine t2max (see below for use)
+       Sa_t2m(:) = strm_Sa_t2m(:)
+       rtmp(1) = maxval(Sa_t2m(:))
+       call ESMF_VMAllReduce(vm, rtmp, rtmp(2:), 1, ESMF_REDUCE_MAX, rc=rc)
+       t2max = rtmp(2)
+       if (mainproc) write(logunit,*) subname,' t2max = ',t2max
 
        ! determine tdewmax (see below for use)
        rtmp(1) = maxval(strm_Sa_tdew(:))
@@ -388,14 +377,30 @@ contains
 
     do n = 1, lsize
        !--- bottom layer height ---
-       if (associated(Sa_z)) then
-         Sa_z(n) = 10.0_r8
+       if (associated(strm_Sa_z)) then
+          Sa_z(n) = strm_Sa_z(n)
+       else
+          Sa_z(n) = 10.0_r8
+       end if
+
+       !--- calculate wind components if wind speed is provided ---
+       if (associated(strm_Sa_wind)) then
+          Sa_u(n) = strm_Sa_wind(n)/sqrt(2.0_r8)
+          Sa_v(n) = Sa_u(n)
+       end if
+       if (associated(strm_Sa_wind10m)) then
+          Sa_u10m(n) = strm_wind10m(n)/sqrt(2.0_r8)
+          Sa_v10m(n) = Sa_u10m(n)
        end if
 
        !--- calculate wind speed ---
-       if (associated(Sa_wspd10m)) then
-         Sa_wspd10m(n) = sqrt(strm_Sa_u10m(n)*strm_Sa_u10m(n) + strm_Sa_v10m(n)*strm_Sa_v10m(n))
+       if (associated(strm_u10m) .and. associated(strm_v10m)) then
+          Sa_wspd10m(n) = sqrt(Sa_u10m(n)*Sa_u10m(n)+Sa_v10m(n)*Sa_v10m(n))
        end if
+       if (associated(strm_u) .and. associated(strm_v) .and. associated(Sa_wspd)) then
+          Sa_wspd(n) = sqrt(Sa_u(n)*Sa_u(n)+Sa_v(n)*Sa_v(n))
+       end if
+
 
        !--- specific humidity at 2m ---
        if (associated(Sa_t2m) .and. associated(Sa_pslv) .and. associated(Sa_q2m)) then
