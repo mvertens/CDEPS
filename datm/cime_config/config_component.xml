@@ -10,7 +10,7 @@
        This file may have atm desc entries.
   -->
   <description modifier_mode="1">
-    <desc atm="DATM[%QIA][%WISOQIA][%CRUJRA2024][%CRUv7][%GSWP3v1][%MOSARTTEST][%NLDAS2][%CPLHIST][%1PT][%NYF][%IAF][%JRA][%JRA-1p4-2018][%JRA-1p5-2023][%JRA-RYF6162][%JRA-RYF8485][%JRA-RYF9091][%JRA-RYF0304][%SIMPLE]"> Data driven ATM </desc>
+    <desc atm="DATM[%QIA][%WISOQIA][%CRUJRA2024][%CRUv7][%GSWP3v1][%MOSARTTEST][%NLDAS2][%CPLHIST][%1PT][%NYF][%IAF][%JRA][%JRA-1p4-2018][%JRA-1p5-2023][%JRA-RYF6162][%JRA-RYF8485][%JRA-RYF9091][%JRA-RYF0304][%SIMPLE][%ERA5][%MEPS]"> Data driven ATM </desc>
     <desc option="QIA"> QIAN data set </desc>
     <desc option="WISOQIA">QIAN with water isotopes</desc>
     <desc option="CRUJRA2024"> CRUJRA 2024 data set </desc>
@@ -29,6 +29,7 @@
     <desc option="JRA-RYF9091"> JRA55 Repeat Year Forcing v1.3 1990-1991</desc>
     <desc option="JRA-RYF0304"> JRA55 Repeat Year Forcing v1.3 2003-2004</desc>
     <desc option="ERA5">ERA5 interannual forcing</desc>
+    <desc option="MEPS">MEPS forcing for wav</desc>
     <desc option="SIMPLE">Namelist-configurable, constant datm forcing for simple experiments</desc>
   </description>
 
@@ -43,7 +44,7 @@
 
   <entry id="DATM_MODE">
     <type>char</type>
-    <valid_values>CORE2_NYF,CORE2_IAF,CLM_QIAN,CLM_QIAN_WISO,1PT,CLMCRUJRA2024,CLMCRUNCEPv7,CLMGSWP3v1,CLMNLDAS2,CPLHIST,CORE_IAF_JRA,CORE_IAF_JRA_1p4_2018,CORE_IAF_JRA_1p5_2023,CORE_RYF6162_JRA,CORE_RYF8485_JRA,CORE_RYF9091_JRA,CORE_RYF0304_JRA,ERA5,SIMPLE</valid_values>
+    <valid_values>CORE2_NYF,CORE2_IAF,CLM_QIAN,CLM_QIAN_WISO,1PT,CLMCRUJRA2024,CLMCRUNCEPv7,CLMGSWP3v1,CLMNLDAS2,CPLHIST,CORE_IAF_JRA,CORE_IAF_JRA_1p4_2018,CORE_IAF_JRA_1p5_2023,CORE_RYF6162_JRA,CORE_RYF8485_JRA,CORE_RYF9091_JRA,CORE_RYF0304_JRA,ERA5,MEPS,SIMPLE</valid_values>
     <default_value>CORE2_NYF</default_value>
     <group>run_component_datm</group>
     <file>env_run.xml</file>
@@ -69,6 +70,7 @@
       <value compset="DATM%NLDAS2">CLMNLDAS2</value>
       <value compset="DATM%1PT">1PT</value>
       <value compset="DATM%ERA5">ERA5</value>
+      <value compset="DATM%MEPS">MEPS</value>
       <value compset="DATM%CPLHIST">CPLHIST</value>
       <value compset="DATM%SIMPLE">SIMPLE</value>
     </values>
@@ -94,6 +96,7 @@
       <value compset="^20TR_"   >hist</value>
       <value compset="_DATM%CPLHIST">cplhist</value>
       <value compset="_DATM.*_DICE.*_DOCN.*_DROF">none</value>
+      <value compset="_DATM%MEPS">none</value>
     </values>
     <group>run_component_datm</group>
     <file>env_run.xml</file>
@@ -116,6 +119,7 @@
       <value compset="^SSP585_"     >SSP5-8.5</value>
       <value compset="_DATM%CPLHIST">cplhist</value>
       <value compset="_DATM.*_DICE.*_DOCN.*_DROF">none</value>
+      <value compset="_DATM%MEPS">none</value>
     </values>
     <group>run_component_datm</group>
     <file>env_run.xml</file>
@@ -243,6 +247,7 @@
       <value compset="2003.*_DATM">$DATM_YR_START</value>
       <value compset="2010.*_DATM">$DATM_YR_START</value>
       <value compset="4804.*_DATM">$DATM_YR_START</value>
+      <value compset="DATM%MEPS">$DATM_YR_START</value>
     </values>
     <group>run_component_datm</group>
     <file>env_run.xml</file>
@@ -308,6 +313,7 @@
       <value compset="2000.*_DATM%NLDAS2">1980</value>
       <value compset="2010.*_DATM%NLDAS2">2005</value>
       <value compset="2003.*_DATM%NLDAS2">2002</value>
+      <value compset="DATM%MEPS">2022</value>
     </values>
     <group>run_component_datm</group>
     <file>env_run.xml</file>
@@ -370,6 +376,7 @@
       <value   compset="2000.*_DATM%NLDAS2">2018</value>
       <value   compset="2010.*_DATM%NLDAS2">2014</value>
       <value   compset="2003.*_DATM%NLDAS2">2003</value>
+      <value   compset="DATM%MEPS">2022</value>
     </values>
     <group>run_component_datm</group>
     <file>env_run.xml</file>

@@ -6,6 +6,7 @@ set(SRCFILES atm_comp_nuopc.F90
              datm_datamode_jra_mod.F90
              datm_datamode_gefs_mod.F90
              datm_datamode_era5_mod.F90
+             datm_datamode_meps_mod.F90
              datm_datamode_simple_mod.F90
              datm_pres_aero_mod.F90
              datm_pres_co2_mod.F90

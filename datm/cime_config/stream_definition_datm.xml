@@ -5555,4 +5555,47 @@
     <stream_readmode>single</stream_readmode>
   </stream_entry>
 
+  <!-- ===================-->
+  <!--  MEPS stream       -->
+  <!-- ===================-->
+
+  <stream_entry name="MEPS">
+    <stream_meshfile>
+      <meshfile>/cluster/work/users/cmi022/MEPS_cdf5_ESMFmesh_251125.nc</meshfile>
+    </stream_meshfile>
+    <stream_datafiles>
+      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files/ww3_wind_202202.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files/ww3_wind_202203.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files/ww3_wind_202204.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files/ww3_wind_202205.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files/ww3_wind_202206.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files/ww3_wind_202207.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files/ww3_wind_202208.nc</file>
+    </stream_datafiles>
+    <stream_datavars>
+      <var>x_wind_10m  Sa_u10m</var>
+      <var>y_wind_10m  Sa_v10m</var>
+    </stream_datavars>
+    <stream_lev_dimname>null</stream_lev_dimname>
+    <stream_mapalgo>
+      <mapalgo>bilinear</mapalgo>
+    </stream_mapalgo>
+    <!-- <stream_vectors>u:v</stream_vectors> -->
+    <stream_vectors>null</stream_vectors>
+    <stream_year_align>2022</stream_year_align>
+    <stream_year_first>2022</stream_year_first>
+    <stream_year_last>2022</stream_year_last>
+    <stream_offset>0</stream_offset>
+    <stream_tintalgo>
+      <tintalgo>linear</tintalgo>
+    </stream_tintalgo>
+    <stream_taxmode>
+      <taxmode>extend</taxmode>
+    </stream_taxmode>
+    <stream_dtlimit>
+      <dtlimit>1.e30</dtlimit>
+    </stream_dtlimit>
+    <stream_readmode>single</stream_readmode>
+  </stream_entry>
+
 </stream_data>
