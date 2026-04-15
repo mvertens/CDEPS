@@ -110,6 +110,14 @@
       <value compset="^2010_"       >clim_2010_cmip6</value>
       <value compset="^HIST[CE]?_"  >hist_cmip6</value>
       <value compset="^20TR_"       >hist_cmip6</value>
+      <!-- For now, the only reliable destinction between NorESM and CESM is BLOM
+           Will have to change this when clm comfig_component for NorESM is created.
+           or a cime variable to destinquish between ESMs is done-->
+      <value compset="^1850[CE]?_.*_BLOM"  >clim_1850_cmip7</value>
+      <value compset="^2000_.*_BLOM"       >clim_2000_cmip7</value>
+      <value compset="^2010_.*_BLOM"       >clim_2010_cmip7</value>
+      <value compset="^HIST[CE]?_.*_BLOM"  >hist_cmip7</value>
+      <value compset="^20TR_.*_BLOM"       >hist_cmip7</value>
       <value compset="^SSP126_"     >SSP1-2.6</value>
       <value compset="^SSP245_"     >SSP2-4.5</value>
       <value compset="^SSP370_"     >SSP3-7.0</value>
