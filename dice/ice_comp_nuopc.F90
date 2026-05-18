@@ -46,6 +46,12 @@ module cdeps_dice_comp
   use dice_datamode_cplhist_mod , only : dice_datamode_cplhist_advance
   use dice_datamode_cplhist_mod , only : dice_datamode_cplhist_restart_read
   use dice_datamode_cplhist_mod , only : dice_datamode_cplhist_restart_write
+  !
+  use dice_datamode_meps_mod    , only : dice_datamode_meps_advertise
+  use dice_datamode_meps_mod    , only : dice_datamode_meps_init_pointers
+  use dice_datamode_meps_mod    , only : dice_datamode_meps_advance
+  use dice_datamode_meps_mod , only : dice_datamode_meps_restart_read
+  use dice_datamode_meps_mod , only : dice_datamode_meps_restart_write
 
   implicit none
   private
@@ -220,6 +226,7 @@ contains
        end if
 
        ! write namelist input to standard out
+       write(logunit,'(3a)')    subname,' case_name         = ',trim(case_name)
        write(logunit,'(3a)')       subname,' datamode       = ',trim(datamode)
        write(logunit,'(3a)')       subname,' model_meshfile = ',trim(model_meshfile)
        write(logunit,'(3a)')       subname,' model_maskfile = ',trim(model_maskfile)
@@ -270,7 +277,7 @@ contains
 
     ! Validate datamode
     select case (trim(datamode))
-    case('ssmi','ssmi_iaf','cplhist')
+    case('ssmi','ssmi_iaf','cplhist','MEPS')
        if (mainproc) write(logunit,'(3a)') subname,' dice datamode = ',trim(datamode)
     case default
        call shr_log_error(' ERROR illegal dice datamode = '//trim(datamode), rc=rc)
@@ -288,6 +295,9 @@ contains
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
     case('cplhist')
        call dice_datamode_cplhist_advertise(exportState, fldsexport, flds_scalar_name, rc)
+       if (ChkErr(rc,__LINE__,u_FILE_u)) return
+    case('MEPS')
+       call dice_datamode_meps_advertise(exportState, fldsexport, flds_scalar_name, rc)
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
     end select
 
@@ -506,6 +516,9 @@ contains
        case('cplhist')
           call dice_datamode_cplhist_init_pointers(exportState, sdat, rc)
           if (chkerr(rc,__LINE__,u_FILE_u)) return
+       case('MEPS')
+          call dice_datamode_meps_init_pointers(exportState, sdat, rc)
+          if (chkerr(rc,__LINE__,u_FILE_u)) return
        end select
 
        ! read restart if needed
@@ -516,8 +529,14 @@ contains
           case('ssmi', 'ssmi_iaf')
              call dice_datamode_ssmi_restart_read(restfilm, rpfile, logunit, my_task, mpicom, sdat, rc)
              if (ChkErr(rc,__LINE__,u_FILE_u)) return
+          case('MEPS')
+             call dice_datamode_meps_restart_read(restfilm, rpfile, logunit, my_task, mpicom, sdat, rc)
+             if (ChkErr(rc,__LINE__,u_FILE_u)) return
           case('cplhist')
              call dice_datamode_cplhist_restart_read(restfilm, rpfile, logunit, my_task, mpicom, sdat)
+          case default
+             call shr_log_error(subName//'datamode '//trim(datamode)//' not recognized', rc=rc)
+             return
           end select
        end if
 
@@ -549,6 +568,9 @@ contains
     case ('cplhist')
        call dice_datamode_cplhist_advance(sdat, rc)
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
+    case('MEPS')
+       call datm_datamode_meps_advance(rc)
+       if (ChkErr(rc,__LINE__,u_FILE_u)) return
     end select
 
     ! Write restarts if needed
@@ -558,6 +580,10 @@ contains
        select case (trim(datamode))
        case('ssmi', 'ssmi_iaf')
           call dice_datamode_ssmi_restart_write(rpfile, case_name, inst_suffix, target_ymd, target_tod, &
+               logunit, my_task, sdat, rc)
+          if (ChkErr(rc,__LINE__,u_FILE_u)) return
+       case('MEPS')
+          call dice_datamode_meps_restart_write(rpfile, case_name, inst_suffix, target_ymd, target_tod, &
                logunit, my_task, sdat, rc)
           if (ChkErr(rc,__LINE__,u_FILE_u)) return
        case ('cplhist')

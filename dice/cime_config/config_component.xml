@@ -13,9 +13,10 @@
        This file may have ice desc entries.
   -->
   <description modifier_mode='1'>
-    <desc ice="DICE[%SSMI][%IAF]">dice mode </desc>
+    <desc ice="DICE[%SSMI][%IAF][%MEPS]">dice mode </desc>
     <desc option="SSMI">is ssmi</desc>
     <desc option="IAF"> is siaf</desc>
+    <desc option="MEPS">MEPS/Topaz ice forcing for wav</desc>
   </description>
 
   <entry id="COMP_ICE">
@@ -29,11 +30,12 @@
 
   <entry id="DICE_MODE">
     <type>char</type>
-    <valid_values>ssmi,ssmi_iaf</valid_values>
+    <valid_values>ssmi,ssmi_iaf,MEPS</valid_values>
     <default_value>ssmi</default_value>
     <values match="last">
       <value compset="DICE%SSMI">ssmi</value>
       <value compset="DICE%IAF">ssmi_iaf</value>
+      <value compset="DICE%MEPS">MEPS</value>
     </values>
     <group>run_component_dice</group>
     <file>env_run.xml</file>

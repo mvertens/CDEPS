@@ -23,6 +23,7 @@
     <values>
       <value dice_mode="ssmi_iaf">ssmi_iaf</value>
       <value dice_mode="ssmi">ssmi_nyf</value>
+      <value dice_mode="MEPS">MEPS</value>
     </values>
   </entry>
 
@@ -30,7 +31,7 @@
     <type>char</type>
     <category>streams</category>
     <group>dice_nml</group>
-    <valid_values>ssmi,ssmi_iaf</valid_values>
+    <valid_values>ssmi,ssmi_iaf,MEPS</valid_values>
     <desc>
       general method that operates on the data.
       Is a prognostic mode. It requires data be sent to the ice  model.
@@ -41,6 +42,7 @@
     <values>
       <value dice_mode="ssmi_iaf">ssmi_iaf</value>
       <value dice_mode="ssmi">ssmi</value>
+      <value dice_mode="MEPS">MEPS</value>
     </values>
   </entry>
 

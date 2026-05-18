@@ -65,4 +65,42 @@
     <stream_readmode>single</stream_readmode>
   </stream_entry>
 
+  <stream_entry name="MEPS">
+    <stream_meshfile>
+      <meshfile>/cluster/work/users/cmi022/grid_weps/MEPS_cdf5_ESMFmesh_251125.nc</meshfile>
+    </stream_meshfile>
+    <stream_datafiles>
+      <file>/cluster/work/users/cmi022/forcing_weps/ice/monthly_files_withcal/ww3_ice_202202.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/ice/monthly_files_withcal/ww3_ice_202203.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/ice/monthly_files_withcal/ww3_ice_202204.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/ice/monthly_files_withcal/ww3_ice_202205.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/ice/monthly_files_withcal/ww3_ice_202206.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/ice/monthly_files_withcal/ww3_ice_202207.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/ice/monthly_files_withcal/ww3_ice_202208.nc</file>
+    </stream_datafiles>
+    <stream_datavars>
+      <var>ice_thick  Si_thick</var>
+      <var>ice_conc  Si_ifrac</var>
+    </stream_datavars>
+    <stream_lev_dimname>null</stream_lev_dimname>
+    <stream_mapalgo>
+      <mapalgo>bilinear</mapalgo>
+    </stream_mapalgo>
+    <stream_vectors>null</stream_vectors>
+    <stream_year_align>2022</stream_year_align>
+    <stream_year_first>2022</stream_year_first>
+    <stream_year_last>2022</stream_year_last>
+    <stream_offset>0</stream_offset>
+    <stream_tintalgo>
+      <tintalgo>linear</tintalgo>
+    </stream_tintalgo>
+    <stream_taxmode>
+      <taxmode>extend</taxmode>
+    </stream_taxmode>
+    <stream_dtlimit>
+      <dtlimit>1.e30</dtlimit>
+    </stream_dtlimit>
+    <stream_readmode>single</stream_readmode>
+  </stream_entry>
+
 </stream_data>
