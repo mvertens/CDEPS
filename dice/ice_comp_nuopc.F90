@@ -31,6 +31,7 @@ module cdeps_dice_comp
   use shr_cal_mod          , only : shr_cal_ymd2date, shr_cal_ymd2julian
   use dshr_mod             , only : dshr_model_initphase, dshr_init, dshr_mesh_init, dshr_check_restart_alarm
   use dshr_mod             , only : dshr_state_setscalar, dshr_set_runclock, dshr_log_clock_advance
+  use dshr_mod             , only : dshr_restart_write, dshr_restart_read
   use dshr_methods_mod     , only : dshr_state_diagnose, chkerr, memcheck
   use dshr_strdata_mod     , only : shr_strdata_type, shr_strdata_init_from_config, shr_strdata_advance
   use dshr_fldlist_mod     , only : fldlist_type, dshr_fldlist_add, dshr_fldlist_realize
@@ -50,8 +51,6 @@ module cdeps_dice_comp
   use dice_datamode_meps_mod    , only : dice_datamode_meps_advertise
   use dice_datamode_meps_mod    , only : dice_datamode_meps_init_pointers
   use dice_datamode_meps_mod    , only : dice_datamode_meps_advance
-  use dice_datamode_meps_mod , only : dice_datamode_meps_restart_read
-  use dice_datamode_meps_mod , only : dice_datamode_meps_restart_write
 
   implicit none
   private
@@ -529,11 +528,11 @@ contains
           case('ssmi', 'ssmi_iaf')
              call dice_datamode_ssmi_restart_read(restfilm, rpfile, logunit, my_task, mpicom, sdat, rc)
              if (ChkErr(rc,__LINE__,u_FILE_u)) return
-          case('MEPS')
-             call dice_datamode_meps_restart_read(restfilm, rpfile, logunit, my_task, mpicom, sdat, rc)
-             if (ChkErr(rc,__LINE__,u_FILE_u)) return
           case('cplhist')
              call dice_datamode_cplhist_restart_read(restfilm, rpfile, logunit, my_task, mpicom, sdat)
+          case('MEPS')
+             call dshr_restart_read(restfilm, rpfile, logunit, my_task, mpicom, sdat, rc)
+             if (ChkErr(rc,__LINE__,u_FILE_u)) return
           case default
              call shr_log_error(subName//'datamode '//trim(datamode)//' not recognized', rc=rc)
              return
@@ -569,7 +568,7 @@ contains
        call dice_datamode_cplhist_advance(sdat, rc)
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
     case('MEPS')
-       call datm_datamode_meps_advance(rc)
+       call dice_datamode_meps_advance(rc)
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
     end select
 
@@ -582,13 +581,13 @@ contains
           call dice_datamode_ssmi_restart_write(rpfile, case_name, inst_suffix, target_ymd, target_tod, &
                logunit, my_task, sdat, rc)
           if (ChkErr(rc,__LINE__,u_FILE_u)) return
-       case('MEPS')
-          call dice_datamode_meps_restart_write(rpfile, case_name, inst_suffix, target_ymd, target_tod, &
-               logunit, my_task, sdat, rc)
-          if (ChkErr(rc,__LINE__,u_FILE_u)) return
        case ('cplhist')
           call dice_datamode_cplhist_restart_write(rpfile, case_name, inst_suffix, target_ymd, target_tod, &
                logunit, my_task, sdat)
+       case('MEPS')
+          call dshr_restart_write(rpfile, case_name, 'dice', inst_suffix, target_ymd, target_tod, logunit, &
+               my_task, sdat, rc)
+          if (ChkErr(rc,__LINE__,u_FILE_u)) return
        end select
     end if
 
