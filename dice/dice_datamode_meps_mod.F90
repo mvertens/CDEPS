@@ -127,7 +127,7 @@ end module dice_datamode_meps_mod
     integer                     , intent(in)    :: tod       ! model sec into model date
     integer                     , intent(in)    :: logunit
     integer                     , intent(in)    :: my_task
-    type(shr_strdata_type)      , intent(inout) :: sdat
+    type(shr_strdata_type)      , intent(in)    :: sdat
     integer                     , intent(out)   :: rc
     !-------------------------------------------------------------------------------
 
@@ -148,7 +148,7 @@ end module dice_datamode_meps_mod
     integer                     , intent(in)    :: logunit
     integer                     , intent(in)    :: my_task
     integer                     , intent(in)    :: mpicom
-    type(shr_strdata_type)      , intent(inout) :: sdat
+    type(shr_strdata_type)      , intent(in)    :: sdat
     integer                     , intent(out)   :: rc
     !-------------------------------------------------------------------------------
 
@@ -158,4 +158,4 @@ end module dice_datamode_meps_mod
     call dshr_restart_read(rest_filem, rpfile, logunit, my_task, mpicom, sdat, rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
 
-  end subroutine dice_datamode_ssmi_restart_read
+ end subroutine dice_datamode_meps_restart_read
