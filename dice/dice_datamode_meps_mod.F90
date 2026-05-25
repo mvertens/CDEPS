@@ -1,7 +1,8 @@
 module dice_datamode_meps_mod
 
-  use ESMF             , only : ESMF_SUCCESS, ESMF_LogWrite, ESMF_LOGMSG_INFO
-  use ESMF             , only : ESMF_State, ESMF_StateGet, ESMF_MeshGet
+  use ESMF             , only : ESMF_State, ESMF_LogWrite, ESMF_Array, ESMF_MeshGet
+  use ESMF             , only : ESMF_SUCCESS, ESMF_LOGMSG_INFO, ESMF_DistGrid
+  use ESMF             , only : ESMF_ArrayCreate, ESMF_ArrayDestroy, ESMF_GridComp
   use NUOPC            , only : NUOPC_Advertise
   use shr_kind_mod     , only : r8=>shr_kind_r8
   use dshr_strdata_mod , only : shr_strdata_get_stream_pointer, shr_strdata_type
@@ -16,12 +17,16 @@ module dice_datamode_meps_mod
   public :: dice_datamode_meps_advance
 
   ! export state pointers
-  real(r8), pointer :: Si_thick(:) => null()
+  real(r8), pointer :: Si_imask(:) => null()
   real(r8), pointer :: Si_ifrac(:) => null()
+  real(r8), pointer :: Si_thick(:) => null()
 
   ! stream data pointers
-  real(r8), pointer :: strm_Si_thick(:) => null()
   real(r8), pointer :: strm_Si_ifrac(:) => null()
+  real(r8), pointer :: strm_Si_thick(:) => null()
+
+  ! internal fields
+  integer , pointer :: imask(:) => null()
 
   character(len=*), parameter :: nullstr = 'null'
   character(len=*), parameter :: u_FILE_u = &
@@ -46,8 +51,9 @@ contains
     rc = ESMF_SUCCESS
 
     call dshr_fldList_add(fldsExport, trim(flds_scalar_name))
-    call dshr_fldList_add(fldsExport, 'Si_thick')
+    call dshr_fldList_add(fldsExport ,'Si_imask'    )
     call dshr_fldList_add(fldsExport, 'Si_ifrac')
+    call dshr_fldList_add(fldsExport, 'Si_thick')
 
     fldlist => fldsExport ! the head of the linked list
     do while (associated(fldlist))
@@ -68,10 +74,31 @@ contains
     integer                , intent(out)   :: rc
 
     ! local variables
+    integer             :: n
+    integer             :: lsize
+    type(ESMF_DistGrid) :: distGrid
+    type(ESMF_Array)    :: elemMaskArray
+    integer             :: spatialDim         ! number of dimension in mesh
+    integer             :: numOwnedElements   ! size of mesh
+    real(r8), pointer   :: ownedElemCoords(:) ! mesh lat and lons
     character(len=*), parameter :: subname='(dice_init_pointers): '
     !-------------------------------------------------------------------------------
 
     rc = ESMF_SUCCESS
+
+    ! Set Si_imask (this corresponds to the ocean mask)
+    call dshr_state_getfldptr(exportState, fldname='Si_imask', fldptr1=Si_imask, rc=rc)
+    if (chkerr(rc,__LINE__,u_FILE_u)) return
+    allocate(imask(sdat%model_lsize))
+    call ESMF_MeshGet(sdat%model_mesh, numOwnedElements=numOwnedElements, elementdistGrid=distGrid, rc=rc)
+    if (ChkErr(rc,__LINE__,u_FILE_u)) return
+    elemMaskArray = ESMF_ArrayCreate(distGrid, imask, rc=rc)
+    if (ChkErr(rc,__LINE__,u_FILE_u)) return
+    call ESMF_MeshGet(sdat%model_mesh, elemMaskArray=elemMaskArray, rc=rc) ! set the values of imask
+    if (ChkErr(rc,__LINE__,u_FILE_u)) return
+    Si_imask(:) = real(imask(:), kind=r8) ! set the mask as real
+    call ESMF_ArrayDestroy(elemMaskArray, rc=rc)
+    if (ChkErr(rc,__LINE__,u_FILE_u)) return
 
     ! initialize export state pointers
     call dshr_state_getfldptr(exportState, 'Si_thick', fldptr1=Si_thick, rc=rc)
@@ -107,8 +134,16 @@ contains
 
     do n = 1,lsize
        ! Set export fields as copies directly from streams
-       Si_thick(n) = strm_Si_thick(n)
-       Si_ifrac(n) = strm_Si_ifrac(n)
+       ! Assume that are using an imask value of 1 here everywhere
+       ! i.e. all components share the atm mesh - this is really not
+       ! correct and is just a temporary hack
+       if (strm_Si_ifrac(n) >= 0._r8) then
+          Si_ifrac(n) = strm_Si_ifrac(n)
+          Si_thick(n) = strm_Si_thick(n)
+       else
+          Si_ifrac(n) = strm_Si_ifrac(n)
+          Si_thick(n) = strm_Si_thick(n)
+       end if
     enddo
 
   end subroutine dice_datamode_meps_advance
