@@ -141,8 +141,8 @@ contains
           Si_ifrac(n) = strm_Si_ifrac(n)
           Si_thick(n) = strm_Si_thick(n)
        else
-          Si_ifrac(n) = strm_Si_ifrac(n)
-          Si_thick(n) = strm_Si_thick(n)
+          Si_ifrac(n) = 0._r8
+          Si_thick(n) = 0._r8
        end if
     enddo
 

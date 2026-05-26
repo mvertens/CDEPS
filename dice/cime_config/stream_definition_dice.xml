@@ -67,7 +67,7 @@
 
   <stream_entry name="MEPS">
     <stream_meshfile>
-      <meshfile>/cluster/work/users/cmi022/grid_weps/MEPS_cdf5_ESMFmesh_251125.nc</meshfile>
+      <meshfile>/cluster/work/users/cmi022/grid_weps/MEPS_cdf5_ESMFmesh_12052026.nc</meshfile>
     </stream_meshfile>
     <stream_datafiles>
       <file>/cluster/work/users/cmi022/forcing_weps/ice/monthly_files_withcal/ww3_ice_202202.nc</file>
