@@ -120,6 +120,11 @@
       <value compset="^2010_.*_BLOM"       >clim_2010_cmip7</value>
       <value compset="^HIST[CE]?_.*_BLOM"  >hist_cmip7</value>
       <value compset="^20TR_.*_BLOM"       >hist_cmip7</value>
+      <value compset="^1850[CE]?_.*.*DATM.*CLM60.*%NORESM">clim_1850_cmip7</value>
+      <value compset="^2000_.*.*DATM.*CLM60.*%NORESM"     >clim_2000_cmip7</value>
+      <value compset="^2010_.*.*DATM.*CLM60.*%NORESM"     >clim_2010_cmip7</value>
+      <value compset="^HIST[CE]?_.*DATM.*CLM60.*%NORESM" >hist_cmip7</value>
+      <value compset="^20TR_.*.*DATM.*CLM60.*%NORESM"    >hist_cmip7</value>
       <value compset="^SSP126_"     >SSP1-2.6</value>
       <value compset="^SSP245_"     >SSP2-4.5</value>
       <value compset="^SSP370_"     >SSP3-7.0</value>
