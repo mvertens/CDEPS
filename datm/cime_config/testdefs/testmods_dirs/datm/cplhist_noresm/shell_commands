@@ -1,0 +1,7 @@
+./xmlchange DATM_CPLHIST_CASE=n1850fates-nocomp-cplhist
+./xmlchange DATM_CPLHIST_DIR='$DIN_LOC_ROOT/cplhist/noresm3_0/n1850fates-nocomp-cplhist/cpl/hist'
+./xmlchange DATM_YR_START=1
+./xmlchange DATM_YR_END=1
+./xmlchange DATM_YR_ALIGN=1
+./xmlchange RUN_STARTDATE="0001-01-01"
+./xmlchange DATM_PRESNDEP="clim_1850_cmip7"
