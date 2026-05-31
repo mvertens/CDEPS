@@ -4,12 +4,14 @@
   <test compset="2000_DATM%QIA_SLND_SICE_DOCN%DOM_SROF_SGLC_SWAV" grid="T42_T42" name="SMS_Ln9_P1" testmods="datm/scam">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
   </test>
   <test compset="2000_DATM%QIA_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
@@ -19,7 +21,8 @@
   <test compset="2000_DATM%CRUv7_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
-      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="gnu" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -28,6 +31,7 @@
   <test compset="HIST_DATM%GSWP3v1_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
@@ -37,15 +41,74 @@
   <test compset="1850_DATM%GSWP3v1_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
     </options>
   </test>
+  <test compset="1850_DATM%CPLHIST_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="ne30pg3_ne30pg3_mtn14" name="ERS_D_Ld5" testmods="datm/cplhist_noresm">
+    <machines>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
+    </machines>
+    <options>
+      <option name="wallclock"> 00:10:00 </option>
+      <option name="comment">Make sure CPLHIST mode will run</option>
+    </options>
+  </test>
+  <test compset="1850_DATM%CPLHIST_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mt232" name="SMS_Ld5" testmods="datm/cplhist">
+    <machines>
+      <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+    </machines>
+    <options>
+      <option name="wallclock"> 00:10:00 </option>
+      <option name="comment">Make sure CPLHIST mode will run</option>
+    </options>
+  </test>
+  <test compset="1850_DATM%CRUJRA2024b_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mt232" name="SMS_D_Ld5" testmods="datm/cplhist_create">
+    <machines>
+      <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+    </machines>
+    <options>
+      <option name="wallclock"> 00:10:00 </option>
+      <option name="comment">Make sure can run creating CPLHIST data to run DATM from with DEBUG on</option>
+    </options>
+  </test>
+  <test compset="1850_DATM%CRUJRA2024b_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mt232" name="ERS_Ld5" testmods="datm/cplhist_create">
+    <machines>
+      <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+    </machines>
+    <options>
+      <option name="wallclock"> 00:10:00 </option>
+      <option name="comment">Make sure can run creating CPLHIST data to run DATM from with DEBUG off</option>
+    </options>
+  </test>
+  <test compset="1850_DATM%CRUJRA2024b_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="ne30pg3_ne30pg3_mtn14" name="SMS_D_Ld5" testmods="datm/cplhist_create">
+    <machines>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="gnu" category="aux_cdeps_noresm"/>
+    </machines>
+    <options>
+      <option name="wallclock"> 00:20:00 </option>
+      <option name="comment">Make sure can run creating CPLHIST data to run DATM from with DEBUG on for noresm grids</option>
+    </options>
+  </test>
+  <test compset="1850_DATM%CRUJRA2024b_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="ne16pg3_ne16pg3_mtn14" name="ERS_Ld5" testmods="datm/cplhist_create">
+    <machines>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
+    </machines>
+    <options>
+      <option name="wallclock"> 00:20:00 </option>
+      <option name="comment">Make sure can run creating CPLHIST data to run DATM from with DEBUG off for noresm grids</option>
+    </options>
+  </test>
   <test compset="2010_DATM%GSWP3v1_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
@@ -55,6 +118,7 @@
   <test compset="SSP126_DATM%GSWP3v1_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
@@ -62,9 +126,10 @@
       <option name="comment">Check that SSP126 compset works right</option>
     </options>
   </test>
-  <test compset="SSP126_DATM%CRUJRA2024_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
+  <test compset="SSP126_DATM%CRUJRA2024b_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+      <machine name="olivia" compiler="gnu" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
@@ -75,6 +140,7 @@
   <test compset="SSP245_DATM%GSWP3v1_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
@@ -85,6 +151,7 @@
   <test compset="SSP370_DATM%GSWP3v1_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
@@ -95,40 +162,53 @@
   <test compset="SSP585_DATM%GSWP3v1_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
     </options>
   </test>
-  <test compset="HIST_DATM%CRUJRA2024_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
+  <test compset="HIST_DATM%CRUJRA2024b_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
-      <machine name="betzy" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="olivia" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
-      <option name="comment">Test historical CRUJRA2024 forcing in a short smoke test to make sure it works</option>
+      <option name="comment">Test historical CRUJRA2024b forcing in a short smoke test to make sure it works</option>
     </options>
   </test>
   <test compset="1850_DATM%CRUJRA2024_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
-      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
       <option name="comment">Test 1850 CRUJRA2024 forcing in a short smoke test to make sure it works</option>
     </options>
   </test>
-  <test compset="2010_DATM%CRUJRA2024_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
+  <test compset="1850_DATM%CRUJRA2024b_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
-      <option name="comment">Test 2010 CRUJRA2024 forcing in a short smoke test to make sure it works</option>
+      <option name="comment">Test 1850 CRUJRA2024b forcing in a short smoke test to make sure it works</option>
+    </options>
+  </test>
+  <test compset="2010_DATM%CRUJRA2024b_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
+    <machines>
+      <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
+    </machines>
+    <options>
+      <option name="wallclock"> 00:10:00 </option>
+      <option name="comment">Test 2010 CRUJRA2024b forcing in a short smoke test to make sure it works</option>
     </options>
   </test>
   <test compset="2000_DATM%NLDAS2_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
@@ -174,6 +254,7 @@
   <test compset="2000_DATM%1PT_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="1x1_mexicocityMEX" name="SMS_Ld5_P1" testmods="datm/1PT">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
@@ -183,6 +264,7 @@
 
   <test compset="2000_DATM%JRA_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="TL319_tn14" name="SMS_Ld5">
     <machines>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
@@ -191,7 +273,8 @@
   </test>
   <test compset="2000_DATM%JRA-1p4-2018_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="TL319_tn14" name="SMS_D_Ld5">
     <machines>
-      <machine name="betzy" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="olivia" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:30:00 </option>
@@ -200,7 +283,7 @@
 
   <test compset="2000_DATM%NYF_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="ne30pg3_tn14" name="SMS_Ld5">
     <machines>
-      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -208,7 +291,8 @@
   </test>
   <test compset="2000_DATM%IAF_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="ne30pg3_tn14" name="SMS_Ld5">
     <machines>
-      <machine name="betzy" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="olivia" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -218,7 +302,8 @@
   <!--Test JRA repeat year forcing-->
   <test compset="1850_DATM%JRA-RYF6162_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="TL319_tn14" name="SMS_D_Ld5">
     <machines>
-      <machine name="betzy" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="olivia" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:30:00 </option>
@@ -226,6 +311,7 @@
   </test>
   <test compset="1850_DATM%JRA-RYF8485_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="TL319_tn14" name="SMS_D_Ld5">
     <machines>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>

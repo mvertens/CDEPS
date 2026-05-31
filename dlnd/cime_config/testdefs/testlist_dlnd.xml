@@ -4,6 +4,7 @@
   <test name="SMS_Ld3" compset="1850_SATM_DLND%SCPL_SICE_SOCN_SROF_SGLC_SWAV" grid="f09_f09_mg17">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
@@ -13,6 +14,7 @@
 
   <test name="ERS_D_Ly4" compset="1850_SATM_DLND%GCPL_SICE_SOCN_SROF_SGLC_SWAV" grid="f09_f09_mg17" testmods="dlnd/glc_forcing">
     <machines>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
@@ -22,6 +24,7 @@
 
   <test name="ERS_D_Ld30" compset="2000_SATM_DLND%RCPL_SICE_SOCN_SROF_SGLC_SWAV" grid="f09_f09_mg17" testmods="dlnd/rof_forcing">
     <machines>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
       <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
