@@ -5,6 +5,7 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -14,6 +15,7 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -23,6 +25,7 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -31,6 +34,7 @@
   <test compset="1850_SATM_SLND_SICE_DOCN%MULTILEV-CPLHIST_SROF_SGLC_SWAV" grid="f09_tn14" name="ERS_D_Ly4" testmods="docn/multilev_cplhist">
     <machines>
       <machine name="olivia" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -40,6 +44,7 @@
   <test compset="1850_SATM_SLND_SICE_DOCN%MULTILEV-DOM_SROF_SGLC_SWAV" grid="f09_tn14" name="SMS_D_Ly4">
     <machines>
       <machine name="olivia" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>

@@ -5,12 +5,14 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
   </test>
   <test compset="2000_DATM%QIA_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -20,6 +22,7 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="gnu" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -29,6 +32,7 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -38,6 +42,7 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -46,6 +51,7 @@
   <test compset="1850_DATM%CPLHIST_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="ne30pg3_ne30pg3_mtn14" name="ERS_D_Ld5" testmods="datm/cplhist_noresm">
     <machines>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -82,7 +88,7 @@
   <test compset="1850_DATM%CRUJRA2024b_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="ne30pg3_ne30pg3_mtn14" name="SMS_D_Ld5" testmods="datm/cplhist_create">
     <machines>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
-      <machine name="olivia" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="gnu" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:20:00 </option>
@@ -92,6 +98,7 @@
   <test compset="1850_DATM%CRUJRA2024b_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="ne16pg3_ne16pg3_mtn14" name="ERS_Ld5" testmods="datm/cplhist_create">
     <machines>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:20:00 </option>
@@ -102,6 +109,7 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -111,6 +119,7 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -120,7 +129,8 @@
   <test compset="SSP126_DATM%CRUJRA2024b_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="f10_f10_mg37" name="SMS_Ld5">
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
-      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="olivia" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -131,6 +141,7 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -141,6 +152,7 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -151,6 +163,7 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -160,6 +173,7 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -179,6 +193,7 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -189,6 +204,7 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -239,6 +255,7 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -248,6 +265,7 @@
   <test compset="2000_DATM%JRA_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="TL319_tn14" name="SMS_Ld5">
     <machines>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -256,6 +274,7 @@
   <test compset="2000_DATM%JRA-1p4-2018_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="TL319_tn14" name="SMS_D_Ld5">
     <machines>
       <machine name="olivia" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:30:00 </option>
@@ -273,6 +292,7 @@
   <test compset="2000_DATM%IAF_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="ne30pg3_tn14" name="SMS_Ld5">
     <machines>
       <machine name="olivia" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
@@ -283,6 +303,7 @@
   <test compset="1850_DATM%JRA-RYF6162_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="TL319_tn14" name="SMS_D_Ld5">
     <machines>
       <machine name="olivia" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:30:00 </option>
@@ -291,6 +312,7 @@
   <test compset="1850_DATM%JRA-RYF8485_SLND_SICE_SOCN_SROF_SGLC_SWAV_SESP" grid="TL319_tn14" name="SMS_D_Ld5">
     <machines>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:30:00 </option>

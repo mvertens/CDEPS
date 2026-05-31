@@ -21,6 +21,7 @@
   <test compset="2000_DATM%NYF_SLND_DICE%IAF_DOCN%DOM_SROF_SGLC_SWAV_SESP" grid="T62_tn14" name="SMS_D_Ld5">
     <machines>
       <machine name="olivia" compiler="gnu" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:30:00 </option>
@@ -28,7 +29,8 @@
   </test>
   <test compset="2000_DATM%NYF_SLND_DICE%SSMI_DOCN%DOM_SROF_SGLC_SWAV_SESP" grid="T62_tn14" name="SMS_D_Ld5">
     <machines>
-      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>>
     </machines>
     <options>
       <option name="wallclock"> 00:30:00 </option>

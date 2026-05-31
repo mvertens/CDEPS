@@ -5,6 +5,7 @@
     <machines>
       <machine name="derecho" compiler="intel" category="aux_cdeps"/>
       <machine name="olivia" compiler="intel" category="aux_cdeps_noresm"/>
+      <machine name="betzy" compiler="intel" category="aux_cdeps_noresm"/>
     </machines>
     <options>
       <option name="wallclock"> 00:10:00 </option>
