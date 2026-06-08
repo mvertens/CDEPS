@@ -5561,16 +5561,17 @@
 
   <stream_entry name="MEPS">
     <stream_meshfile>
-      <meshfile>/cluster/work/users/cmi022/MEPS_cdf5_ESMFmesh_251125.nc</meshfile>
+      <!-- <meshfile>/cluster/work/users/cmi022/grid_mepsa/MEPS_cdf5_ESMFmesh_251125.nc</meshfile> -->
+      <meshfile>/cluster/work/users/cmi022/grid_mepsa/mesh_cdf5_mepsa_05062026.nc</meshfile>
     </stream_meshfile>
     <stream_datafiles>
-      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files/ww3_wind_202202.nc</file>
-      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files/ww3_wind_202203.nc</file>
-      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files/ww3_wind_202204.nc</file>
-      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files/ww3_wind_202205.nc</file>
-      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files/ww3_wind_202206.nc</file>
-      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files/ww3_wind_202207.nc</file>
-      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files/ww3_wind_202208.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files_withcal/ww3_wind_202202.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files_withcal/ww3_wind_202203.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files_withcal/ww3_wind_202204.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files_withcal/ww3_wind_202205.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files_withcal/ww3_wind_202206.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files_withcal/ww3_wind_202207.nc</file>
+      <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files_withcal/ww3_wind_202208.nc</file>
     </stream_datafiles>
     <stream_datavars>
       <var>x_wind_10m  Sa_u10m</var>
