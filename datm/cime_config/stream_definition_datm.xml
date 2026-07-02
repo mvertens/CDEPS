@@ -5562,7 +5562,7 @@
   <stream_entry name="MEPS">
     <stream_meshfile>
       <!-- <meshfile>/cluster/work/users/cmi022/grid_mepsa/MEPS_cdf5_ESMFmesh_251125.nc</meshfile> -->
-      <meshfile>/cluster/work/users/cmi022/grid_mepsa/mesh_cdf5_mepsa_05062026.nc</meshfile>
+      <meshfile>/cluster/work/users/cmi022/new_mesh_files/mesh_cdf5_atm_090626.nc</meshfile>
     </stream_meshfile>
     <stream_datafiles>
       <file>/cluster/work/users/cmi022/forcing_weps/wind/monthly_files_withcal/ww3_wind_202202.nc</file>
