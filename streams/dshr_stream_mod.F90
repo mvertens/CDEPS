@@ -85,6 +85,9 @@ module dshr_stream_mod
   character(len=CS),parameter,public :: shr_stream_mapalgo_consd    = 'consd'
   character(len=CL),parameter,public :: shr_stream_mapalgo_mapfile  = 'mapfile:'
   character(len=CS),parameter,public :: shr_stream_mapalgo_none     = 'none'
+  ! nearest_lat: no source mesh; input is lat/time or lat/lev/time and is mapped
+  ! to the nearest model latitude (all levels), then time interpolated
+  character(len=CS),parameter,public :: shr_stream_mapalgo_nearest_lat = 'nearest_lat'
 
   ! a useful derived type to use inside shr_streamType ---
   type shr_stream_file_type
@@ -114,6 +117,7 @@ module dshr_stream_mod
      integer           :: yearLast     = -1                     ! last  year to use in t-axis (yyyymmdd)
      integer           :: yearAlign    = -1                     ! align yearFirst with this model year
      character(len=CS) :: lev_dimname  = 'null'                 ! name of vertical dimension if any
+     character(len=CS) :: lat_name     = 'lat'                  ! name of latitude coord/dim (mapalgo='nearest_lat' streams)
      character(len=CS) :: taxMode      = shr_stream_taxis_cycle ! cycling option for time axis
      character(len=CS) :: tInterpAlgo  = 'linear'               ! algorithm to use for time interpolation
      character(len=CL) :: mapalgo      = 'bilinear'             ! type of mapping - default is 'bilinear'
@@ -477,7 +481,8 @@ contains
        stream_yearFirst, stream_yearLast, stream_yearAlign, &
        stream_offset, stream_taxmode, stream_tintalgo, stream_dtlimit, &
        stream_fldlistFile, stream_fldListModel, stream_fileNames, &
-       logunit, compname, isroot_task, stream_src_mask_val, stream_dst_mask_val)
+       logunit, compname, isroot_task, stream_src_mask_val, stream_dst_mask_val, &
+       stream_lat_name)
 
     use ESMF, only : ESMF_VM, ESMF_VMGetCurrent
 
@@ -509,6 +514,7 @@ contains
     logical                     ,intent(in)              :: isroot_task            ! mainproc
     integer                     ,optional, intent(in)    :: stream_src_mask_val    ! source mask value
     integer                     ,optional, intent(in)    :: stream_dst_mask_val    ! destination mask value
+    character(len=*)            ,optional, intent(in)    :: stream_lat_name        ! latitude coord name (nearest_lat streams)
 
     ! local variables
     integer       :: n
@@ -532,6 +538,7 @@ contains
     streamdat(1)%meshFile     = trim(stream_meshFile)
     streamdat(1)%lev_dimname  = trim(stream_lev_dimname)
     streamdat(1)%mapalgo      = trim(stream_mapalgo)
+    if (present(stream_lat_name)) streamdat(1)%lat_name = trim(stream_lat_name)
 
     streamdat(1)%yearFirst    = stream_yearFirst
     streamdat(1)%yearLast     = stream_yearLast

@@ -34,6 +34,7 @@ module dshr_strdata_mod
   use shr_string_mod   , only : shr_string_listgetname, shr_string_listisvalid, shr_string_listgetnum
 
   use dshr_stream_mod  , only : shr_stream_streamtype, shr_stream_getModelFieldList, shr_stream_getStreamFieldList
+  use dshr_stream_mod  , only : shr_stream_mapalgo_nearest_lat
   use dshr_stream_mod  , only : shr_stream_taxis_cycle, shr_stream_taxis_extend, shr_stream_findBounds
   use dshr_stream_mod  , only : shr_stream_getCurrFile, shr_stream_setCurrFile, shr_stream_getMeshFilename
   use dshr_stream_mod  , only : shr_stream_init_from_inline, shr_stream_init_from_esmfconfig
@@ -100,6 +101,11 @@ module dshr_strdata_mod
      character(len=CL), allocatable      :: fldlist_model(:)                ! names of stream model fields
      integer                             :: stream_nlev                     ! number of vertical levels in stream
      real(r8), allocatable               :: stream_vlevs(:)                 ! values of vertical levels in stream
+     ! nearest-lat (zonal) stream support: mapalgo='nearest_lat', no source mesh
+     logical                             :: is_zonal = .false.              ! true => lat[/lev]/time nearest-lat stream
+     integer                             :: nlat_src = 0                    ! number of source latitudes read from file
+     real(r8), allocatable               :: src_lats(:)                     ! source latitudes read from file (nlat_src)
+     integer , allocatable               :: latindex(:)                     ! nearest src-lat index per local model element
      integer                             :: stream_lb                       ! index of the Lowerbound (LB) in fldlist_stream
      integer                             :: stream_ub                       ! index of the Upperbound (UB) in fldlist_stream
      type(ESMF_Field)                    :: field_stream                    ! a field on the stream data domain
@@ -263,7 +269,7 @@ contains
        stream_filenames, stream_fldlistFile, stream_fldListModel, &
        stream_yearFirst, stream_yearLast, stream_yearAlign, &
        stream_offset, stream_taxmode, stream_dtlimit, stream_tintalgo, &
-       stream_src_mask, stream_dst_mask, stream_name, rc)
+       stream_src_mask, stream_dst_mask, stream_name, stream_lat_name, rc)
 
     ! input/output variables
     type(shr_strdata_type)      , intent(inout) :: sdat                   ! stream data type
@@ -288,6 +294,7 @@ contains
     integer          , optional , intent(in)    :: stream_src_mask        ! source mask value
     integer          , optional , intent(in)    :: stream_dst_mask        ! destination mask value
     character(len=*) , optional , intent(in)    :: stream_name            ! name of stream
+    character(len=*) , optional , intent(in)    :: stream_lat_name        ! latitude coord name (nearest_lat streams)
     integer          , optional , intent(out)   :: rc                     ! error code
 
     ! local variables
@@ -341,7 +348,8 @@ contains
          stream_yearFirst, stream_yearLast, stream_yearAlign, &
          stream_offset, stream_taxmode, stream_tintalgo, stream_dtlimit, &
          stream_fldlistFile, stream_fldListModel, stream_fileNames, &
-         sdat%logunit, trim(compname), sdat%mainproc, src_mask, dst_mask)
+         sdat%logunit, trim(compname), sdat%mainproc, src_mask, dst_mask, &
+         stream_lat_name=stream_lat_name)
 
     ! Now finish initializing sdat
     call shr_strdata_init(sdat, model_clock, stream_name, rc)
@@ -468,6 +476,7 @@ contains
     type(ESMF_VM)                :: vm
     integer                      :: nvars
     integer                      :: i, stream_nlev, index, istat
+    integer                      :: n               ! model element loop index (nearest-lat map)
     character(len=CL)            :: stream_vector_names
     character(len=CL)            :: mapfile
     character(len=*), parameter  :: subname='(shr_sdat_init)'
@@ -508,6 +517,33 @@ contains
        ! Determine the number of stream levels
        call shr_strdata_get_stream_nlev(sdat, ns, rc=rc)
        stream_nlev = sdat%pstrm(ns)%stream_nlev
+
+       ! ------------------------------------
+       ! Nearest-latitude (zonal) stream setup
+       ! ------------------------------------
+       ! For a lat/time or lat/lev/time input there is no source mesh (meshfile='none').
+       ! Read the source latitudes from the first data file and precompute, for each
+       ! local model element, the nearest source-latitude index.  The spatial "regrid"
+       ! then reduces to a purely local gather (no ESMF mesh, routehandle or comms).
+       sdat%pstrm(ns)%is_zonal = (trim(sdat%stream(ns)%mapalgo) == shr_stream_mapalgo_nearest_lat)
+       if (sdat%pstrm(ns)%is_zonal) then
+          call zonal_read_coord(sdat, ns, trim(sdat%stream(ns)%lat_name), rc=rc)
+          if (chkerr(rc,__LINE__,u_FILE_u)) return
+          allocate(sdat%pstrm(ns)%latindex(sdat%model_lsize), stat=istat)
+          if (istat /= 0) then
+             call shr_log_error(subName//': allocation error for sdat%pstrm(ns)%latindex', rc=rc)
+             return
+          end if
+          ! nearest source latitude for each local model element (model_lat is in degrees)
+          do n = 1, sdat%model_lsize
+             sdat%pstrm(ns)%latindex(n) = &
+                  minloc(abs(sdat%pstrm(ns)%src_lats - sdat%model_lat(n)), dim=1)
+          end do
+          if (sdat%mainproc) then
+             write(sdat%logunit,'(2a,i0,a)') subname, &
+                  ' Stream: ',ns,' is a nearest-latitude (zonal) stream - no source mesh used'
+          end if
+       end if
 
        ! Determine field names for stream fields with both stream file names and data model names
        nvars = sdat%stream(ns)%nvars
@@ -633,7 +669,9 @@ contains
        if (chkerr(rc,__LINE__,u_FILE_u)) return
 
        if (.not.  ESMF_MeshIsCreated(stream_mesh)) then
-          sdat%stream(ns)%mapalgo = 'none'
+          ! A nearest-lat (zonal) stream also has no source mesh, but must keep its
+          ! mapalgo so the zonal read/gather path is taken (do not reset to 'none').
+          if (.not. sdat%pstrm(ns)%is_zonal) sdat%stream(ns)%mapalgo = 'none'
        else
           if (trim(sdat%stream(ns)%mapalgo) == "bilinear") then
              call ESMF_FieldRegridStore(sdat%pstrm(ns)%field_stream, lfield_dst, &
@@ -1678,6 +1716,17 @@ contains
     endif
 
     ! ******************************************************************************
+    ! Nearest-latitude (zonal) stream: read the lat[/lev]/time slab for this time
+    ! record and gather it to the nearest model latitude directly into fldbun_data.
+    ! This bypasses the source mesh, pio decomposition and ESMF regrid entirely.
+    ! ******************************************************************************
+    if (per_stream%is_zonal) then
+       call shr_strdata_readstrm_zonal(sdat, per_stream, pioid, nt, fldbun_data, rc)
+       if (chkerr(rc,__LINE__,u_FILE_u)) return
+       return
+    end if
+
+    ! ******************************************************************************
     ! Determine the pio io descriptor for the stream from the first data field in the stream
     ! ******************************************************************************
 
@@ -2154,6 +2203,161 @@ contains
     call ESMF_TraceRegionExit(trim(istr)//'_readpio')
 
   end subroutine shr_strdata_readstrm
+
+  !===============================================================================
+  subroutine zonal_read_coord(sdat, ns, coordname, rc)
+
+    ! Read the source latitude coordinate (whole 1-D array, redundantly on every
+    ! task) from the first data file of a nearest-lat (zonal) stream.  Mirrors the
+    ! coordinate-read pattern used by shr_strdata_get_stream_nlev for vertical levels.
+
+    ! input/output variables
+    type(shr_strdata_type) , intent(inout) :: sdat
+    integer                , intent(in)    :: ns          ! stream index
+    character(len=*)       , intent(in)    :: coordname   ! latitude coord/dim name (e.g. 'lat')
+    integer                , intent(out)   :: rc
+
+    ! local variables
+    type(ESMF_VM)     :: vm
+    type(file_desc_t) :: pioid
+    type(var_desc_t)  :: varid
+    integer           :: dimid, nlat, rcode, istat
+    character(len=CX) :: filename
+    character(len=*), parameter :: subname = '(zonal_read_coord) '
+    !-------------------------------------------------------------------------------
+
+    rc = ESMF_SUCCESS
+
+    call ESMF_VMGetCurrent(vm, rc=rc)
+    if (ChkErr(rc,__LINE__,u_FILE_u)) return
+    if (sdat%mainproc) then
+       call shr_stream_getData(sdat%stream(ns), 1, filename)
+    end if
+    call ESMF_VMBroadCast(vm, filename, CX, 0, rc=rc)
+    if (ChkErr(rc,__LINE__,u_FILE_u)) return
+
+    rcode = pio_openfile(sdat%pio_subsystem, pioid, sdat%io_type, trim(filename), pio_nowrite)
+    rcode = pio_inq_dimid(pioid, trim(coordname), dimid)
+    rcode = pio_inq_dimlen(pioid, dimid, nlat)
+    allocate(sdat%pstrm(ns)%src_lats(nlat), stat=istat)
+    if ( istat /= 0 ) then
+       call shr_log_error(subName//': allocation error for sdat%pstrm(ns)%src_lats', rc=rc)
+       return
+    end if
+    rcode = pio_inq_varid(pioid, trim(coordname), varid)
+    rcode = pio_get_var(pioid, varid, sdat%pstrm(ns)%src_lats)
+    call pio_closefile(pioid)
+
+    sdat%pstrm(ns)%nlat_src = nlat
+    if (sdat%mainproc) then
+       write(sdat%logunit,'(2a,i0,a,i0)') subname,'Stream: ',ns,' number of source latitudes = ',nlat
+    end if
+
+  end subroutine zonal_read_coord
+
+  !===============================================================================
+  subroutine shr_strdata_readstrm_zonal(sdat, per_stream, pioid, nt, fldbun_data, rc)
+
+    ! Read one time record (nt) of every field in a nearest-lat (zonal) stream and
+    ! gather it to the nearest model latitude, filling fldbun_data on the model mesh.
+    ! The source slab data is read undistributed (whole lat[/lev] slab) on every task and
+    ! the gather is a purely local index copy using per_stream%latindex.
+    !
+    ! The file variable is assumed dimensioned (lat,time) or (lat,lev,time) in
+    ! Fortran/pio start-count order (time is the record dimension, lat varies fastest).
+
+    ! input/output variables
+    type(shr_strdata_type)      , intent(inout) :: sdat
+    type(shr_strdata_perstream) , intent(inout) :: per_stream
+    type(file_desc_t)           , intent(inout) :: pioid
+    integer                     , intent(in)    :: nt          ! time record index
+    type(ESMF_FieldBundle)      , intent(inout) :: fldbun_data
+    integer                     , intent(out)   :: rc
+
+    ! local variables
+    type(ESMF_Field)      :: field_dst
+    type(var_desc_t)      :: varid
+    integer               :: nf, n, nlat, nlev, rcode, pio_iovartype
+    real(r8), pointer     :: dstptr1d(:)         ! model field data (lsize)
+    real(r8), pointer     :: dstptr2d(:,:)       ! model field data (nlev,lsize)
+    real(r4), allocatable :: src_r4_1d(:), src_r4_2d(:,:)
+    real(r8), allocatable :: src_r8_1d(:), src_r8_2d(:,:)
+    character(len=*), parameter :: subname = '(shr_strdata_readstrm_zonal) '
+    !-------------------------------------------------------------------------------
+
+    rc = ESMF_SUCCESS
+    nlat = per_stream%nlat_src
+    nlev = per_stream%stream_nlev
+
+    do nf = 1, size(per_stream%fldlist_stream)
+
+       rcode = pio_inq_varid(pioid, trim(per_stream%fldlist_stream(nf)), varid)
+       rcode = pio_inq_vartype(pioid, varid, pio_iovartype)
+
+       call dshr_fldbun_getfieldN(fldbun_data, nf, field_dst, rc=rc)
+       if (chkerr(rc,__LINE__,u_FILE_u)) return
+
+       if (nlev > 1) then
+          ! lat/lev/time: gather a full column (all levels) at the nearest latitude
+          call dshr_field_getfldptr(field_dst, fldptr2=dstptr2d, rc=rc)  ! (nlev,lsize)
+          if (chkerr(rc,__LINE__,u_FILE_u)) return
+          if (pio_iovartype == PIO_REAL) then
+             allocate(src_r4_2d(nlat,nlev))
+             rcode = pio_get_var(pioid, varid, start=(/1,1,nt/), count=(/nlat,nlev,1/), ival=src_r4_2d)
+             do n = 1, size(dstptr2d, dim=2)
+                dstptr2d(:,n) = real(src_r4_2d(per_stream%latindex(n),:), kind=r8)
+             end do
+             deallocate(src_r4_2d)
+          else if (pio_iovartype == PIO_DOUBLE) then
+             allocate(src_r8_2d(nlat,nlev))
+             rcode = pio_get_var(pioid, varid, start=(/1,1,nt/), count=(/nlat,nlev,1/), ival=src_r8_2d)
+             do n = 1, size(dstptr2d, dim=2)
+                dstptr2d(:,n) = src_r8_2d(per_stream%latindex(n),:)
+             end do
+             deallocate(src_r8_2d)
+          else
+             call shr_log_error(subName//'ERROR: only real/double types supported for zonal streams', rc=rc)
+             return
+          end if
+       else
+          ! lat/time: gather the nearest-latitude value
+          call dshr_field_getfldptr(field_dst, fldptr1=dstptr1d, rc=rc)  ! (lsize)
+          if (chkerr(rc,__LINE__,u_FILE_u)) return
+          if (pio_iovartype == PIO_REAL) then
+             allocate(src_r4_1d(nlat))
+             rcode = pio_get_var(pioid, varid, start=(/1,nt/), count=(/nlat,1/), ival=src_r4_1d)
+             do n = 1, size(dstptr1d)
+                dstptr1d(n) = real(src_r4_1d(per_stream%latindex(n)), kind=r8)
+             end do
+             deallocate(src_r4_1d)
+          else if (pio_iovartype == PIO_DOUBLE) then
+             allocate(src_r8_1d(nlat))
+             rcode = pio_get_var(pioid, varid, start=(/1,nt/), count=(/nlat,1/), ival=src_r8_1d)
+             do n = 1, size(dstptr1d)
+                dstptr1d(n) = src_r8_1d(per_stream%latindex(n))
+             end do
+             deallocate(src_r8_1d)
+          else
+             call shr_log_error(subName//'ERROR: only real/double types supported for zonal streams', rc=rc)
+             return
+          end if
+       end if
+
+       if (rcode /= PIO_NOERR) then
+          rc = rcode
+          call shr_log_error(subName//'ERROR: reading zonal stream variable: '// &
+               trim(per_stream%fldlist_stream(nf)), rc=rc)
+          return
+       end if
+
+       if (debug_level > 0 .and. sdat%mainproc) then
+          write(sdat%logunit,'(a,4x,5a,i0)') subname, &
+               ' zonal read ',trim(per_stream%fldlist_stream(nf)), &
+               ' into ',trim(per_stream%fldlist_model(nf)),' at time index: ',nt
+       end if
+    end do
+
+  end subroutine shr_strdata_readstrm_zonal
 
   !===============================================================================
   subroutine shr_strdata_set_stream_iodesc(sdat, per_stream, fldname, pioid, rc)
