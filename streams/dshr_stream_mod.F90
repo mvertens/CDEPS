@@ -248,15 +248,16 @@ contains
           p => item(getElementsByTagname(streamnode, "mapalgo"), 0)
           if (associated(p)) then
              call extractDataContent(p, streamdat(i)%mapalgo)
-             if (streamdat(i)%mapalgo /= shr_stream_mapalgo_bilinear .and. &
-                 streamdat(i)%mapalgo /= shr_stream_mapalgo_redist   .and. &
-                 streamdat(i)%mapalgo /= shr_stream_mapalgo_nn       .and. &
-                 streamdat(i)%mapalgo /= shr_stream_mapalgo_consf    .and. &
-                 streamdat(i)%mapalgo /= shr_stream_mapalgo_consd    .and. &
+             if (streamdat(i)%mapalgo /= shr_stream_mapalgo_bilinear    .and. &
+                 streamdat(i)%mapalgo /= shr_stream_mapalgo_redist      .and. &
+                 streamdat(i)%mapalgo /= shr_stream_mapalgo_nn          .and. &
+                 streamdat(i)%mapalgo /= shr_stream_mapalgo_consf       .and. &
+                 streamdat(i)%mapalgo /= shr_stream_mapalgo_consd       .and. &
+                 streamdat(i)%mapalgo /= shr_stream_mapalgo_nearest_lat .and. &
                  streamdat(i)%mapalgo(1:8) /= shr_stream_mapalgo_mapfile .and. &
                  streamdat(i)%mapalgo /= shr_stream_mapalgo_none) then
-                call shr_log_error("mapaglo must have a value of either bilinear, redist, nn, consf, consd or "//&
-                     " mapalgo(1:8) must equal mapfile: ", rc=rc)
+                call shr_log_error("mapaglo must have a value of either bilinear, redist, nn, consf, consd, "//&
+                     "nearest_lat, none or mapalgo(1:8) must equal mapfile: ", rc=rc)
                 return
              end if
           endif
@@ -331,6 +332,12 @@ contains
              call extractDataContent(p, streamdat(i)%lev_dimname)
           else
              call shr_sys_abort(subname//" stream vertical level dimension name must be provided")
+          endif
+
+          ! Determine name of latitude coordinate (optional; used by mapalgo='nearest_lat')
+          p => item(getElementsByTagname(streamnode, "lat_name"), 0)
+          if (associated(p)) then
+             call extractDataContent(p, streamdat(i)%lat_name)
           endif
 
           ! Determine input data files
@@ -421,6 +428,8 @@ contains
        call ESMF_VMBroadCast(vm, streamdat(i)%meshfile,     CL, 0, rc=rc)
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
        call ESMF_VMBroadCast(vm, streamdat(i)%lev_dimname,  CS, 0, rc=rc)
+       if (ChkErr(rc,__LINE__,u_FILE_u)) return
+       call ESMF_VMBroadCast(vm, streamdat(i)%lat_name,     CS, 0, rc=rc)
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
        call ESMF_VMBroadCast(vm, streamdat(i)%taxmode,      CS, 0, rc=rc)
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
@@ -758,6 +767,12 @@ contains
       else
          call shr_log_error("stream_lev_dimname must be provided", rc=rc)
          return
+      endif
+
+      ! Optional latitude coordinate name (used by mapalgo='nearest_lat'); defaults to 'lat'
+      if( ESMF_ConfigGetLen(config=CF, label="stream_lat_name"//mystrm//':', rc=rc) > 0 ) then
+        call ESMF_ConfigGetAttribute(CF,value=streamdat(i)%lat_name,label="stream_lat_name"//mystrm//':', rc=rc)
+        if (ChkErr(rc,__LINE__,u_FILE_u)) return
       endif
 
       ! Get a list of stream file names
