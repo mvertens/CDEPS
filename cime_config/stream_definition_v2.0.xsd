@@ -33,6 +33,7 @@
   <!-- ======================== -->
 
   <xs:element name="stream_lev_dimname" type="xs:string"/>
+  <xs:element name="stream_lat_dimname"    type="xs:string"/>
   <xs:element name="stream_year_first"  type="xs:string"/>
   <xs:element name="stream_year_last"   type="xs:string"/>
   <xs:element name="stream_year_align"  type="xs:string"/>
@@ -138,6 +139,7 @@
       <xs:pattern value="bilinear"/>
       <xs:pattern value="redist"/>
       <xs:pattern value="nn"/>
+      <xs:pattern value="nearest_lat"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="mapalgo">
@@ -212,6 +214,7 @@
         <xs:element ref="stream_datafiles"   minOccurs="1" maxOccurs="1"/>
         <xs:element ref="stream_datavars"    minOccurs="1" maxOccurs="1"/>
         <xs:element ref="stream_lev_dimname" minOccurs="1" maxOccurs="1"/>
+        <xs:element ref="stream_lat_dimname" minOccurs="0" maxOccurs="1"/>
         <xs:element ref="stream_mapalgo"     minOccurs="1" maxOccurs="1"/>
         <xs:element ref="stream_vectors"     minOccurs="1" maxOccurs="1"/>
         <xs:element ref="stream_year_align"  minOccurs="1" maxOccurs="1"/>

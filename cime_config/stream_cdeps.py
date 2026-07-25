@@ -31,6 +31,7 @@ _stream_file_template = """
    <vectors>{stream_vectors}</vectors>
    <meshfile>{stream_meshfile}</meshfile>
    <lev_dimname>{stream_lev_dimname}</lev_dimname>
+   <lat_dimname>{stream_lat_dimname}</lat_dimname>
    <datafiles>
       {stream_datafiles}
    </datafiles>
@@ -43,7 +44,7 @@ _stream_file_template = """
 """
 
 valid_values = {}
-valid_values["mapalgo"] = ["bilinear", "nn", "redist", "mapconsd", "mapconf", "none"]
+valid_values["mapalgo"] = ["bilinear", "nn", "redist", "mapconsd", "mapconf", "none", "nearest_lat"]
 valid_values["tintalgo"] = ["lower", "upper", "nearest", "linear", "coszen"]
 valid_values["taxmode"] = ["cycle", "extend", "limit"]
 
@@ -359,6 +360,9 @@ class StreamCDEPS(GenericXML):
                         stream_datafiles = stream_datafiles.replace(
                             "<file>", ""
                         ).replace("</file>", "")
+
+            # lat_dimname is optional (only used by mapalgo='nearest_lat'); default to 'lat'
+            stream_vars.setdefault("stream_lat_dimname", "lat")
 
             # append to stream xml file
             stream_file_text = _stream_file_template.format(**stream_vars)
