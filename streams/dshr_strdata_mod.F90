@@ -2279,7 +2279,7 @@ contains
     ! local variables
     type(ESMF_Field)      :: field_dst
     type(var_desc_t)      :: varid
-    integer               :: nf, ng, nlat, nlev, rcode, pio_iovartype
+    integer               :: nf, ng, nlat, nlev, rcode, pio_iovartype, istat
     real(r8), pointer     :: dstptr1d(:)         ! model field data (lsize)
     real(r8), pointer     :: dstptr2d(:,:)       ! model field data (nlev,lsize)
     real(r4), allocatable :: src_r4_1d(:), src_r4_2d(:,:)
@@ -2304,14 +2304,24 @@ contains
           call dshr_field_getfldptr(field_dst, fldptr2=dstptr2d, rc=rc)  ! (nlev,lsize)
           if (chkerr(rc,__LINE__,u_FILE_u)) return
           if (pio_iovartype == PIO_REAL) then
-             allocate(src_r4_2d(nlat,nlev))
+             allocate(src_r4_2d(nlat,nlev), stat=istat)
+             if (istat /= 0) then
+                call shr_log_error(subName//'allocation error of src_r4_2d with size '// &
+                     toString(nlat*nlev), rc=rc)
+                return
+             end if
              rcode = pio_get_var(pioid, varid, start=(/1,1,nt/), count=(/nlat,nlev,1/), ival=src_r4_2d)
              do ng = 1, size(dstptr2d, dim=2)
                 dstptr2d(:,ng) = real(src_r4_2d(per_stream%latindex(ng),:), kind=r8)
              end do
              deallocate(src_r4_2d)
           else if (pio_iovartype == PIO_DOUBLE) then
-             allocate(src_r8_2d(nlat,nlev))
+             allocate(src_r8_2d(nlat,nlev), stat=istat)
+             if (istat /= 0) then
+                call shr_log_error(subName//'allocation error of src_r8_2d with size '// &
+                     toString(nlat*nlev), rc=rc)
+                return
+             end if
              rcode = pio_get_var(pioid, varid, start=(/1,1,nt/), count=(/nlat,nlev,1/), ival=src_r8_2d)
              do ng = 1, size(dstptr2d, dim=2)
                 dstptr2d(:,ng) = src_r8_2d(per_stream%latindex(ng),:)
@@ -2326,14 +2336,24 @@ contains
           call dshr_field_getfldptr(field_dst, fldptr1=dstptr1d, rc=rc)  ! (lsize)
           if (chkerr(rc,__LINE__,u_FILE_u)) return
           if (pio_iovartype == PIO_REAL) then
-             allocate(src_r4_1d(nlat))
+             allocate(src_r4_1d(nlat), stat=istat)
+             if (istat /= 0) then
+                call shr_log_error(subName//'allocation error of src_r4_1d with size '// &
+                     toString(nlat), rc=rc)
+                return
+             end if
              rcode = pio_get_var(pioid, varid, start=(/1,nt/), count=(/nlat,1/), ival=src_r4_1d)
              do ng = 1, size(dstptr1d)
                 dstptr1d(ng) = real(src_r4_1d(per_stream%latindex(ng)), kind=r8)
              end do
              deallocate(src_r4_1d)
           else if (pio_iovartype == PIO_DOUBLE) then
-             allocate(src_r8_1d(nlat))
+             allocate(src_r8_1d(nlat), stat=istat)
+             if (istat /= 0) then
+                call shr_log_error(subName//'allocation error of src_r8_1d with size '// &
+                     toString(nlat), rc=rc)
+                return
+             end if
              rcode = pio_get_var(pioid, varid, start=(/1,nt/), count=(/nlat,1/), ival=src_r8_1d)
              do ng = 1, size(dstptr1d)
                 dstptr1d(ng) = src_r8_1d(per_stream%latindex(ng))
