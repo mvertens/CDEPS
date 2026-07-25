@@ -82,6 +82,8 @@ module dshr_strdata_mod
   private :: shr_strdata_init_model_domain
   private :: shr_strdata_get_stream_nlev
   private :: shr_strdata_readLBUB
+  private :: shr_strdata_zonal_readstrm
+  private :: shr_strdata_zonal_read_coord
 
   ! Public data members:
   integer                              :: debug_level = 0  ! local debug flag
@@ -527,7 +529,7 @@ contains
        ! then reduces to a purely local gather (no ESMF mesh, routehandle or comms).
        sdat%pstrm(ns)%is_zonal = (trim(sdat%stream(ns)%mapalgo) == shr_stream_mapalgo_nearest_lat)
        if (sdat%pstrm(ns)%is_zonal) then
-          call zonal_read_coord(sdat, ns, trim(sdat%stream(ns)%lat_name), rc=rc)
+          call shr_strdata_zonal_read_coord(sdat, ns, trim(sdat%stream(ns)%lat_name), rc=rc)
           if (chkerr(rc,__LINE__,u_FILE_u)) return
           allocate(sdat%pstrm(ns)%latindex(sdat%model_lsize), stat=istat)
           if (istat /= 0) then
@@ -537,7 +539,7 @@ contains
           ! nearest source latitude for each local model element (model_lat is in degrees)
           do n = 1, sdat%model_lsize
              sdat%pstrm(ns)%latindex(n) = &
-                  minloc(abs(sdat%pstrm(ns)%src_lats - sdat%model_lat(n)), dim=1)
+                  minloc(abs(sdat%pstrm(ns)%src_lats(:) - sdat%model_lat(n)), dim=1)
           end do
           if (sdat%mainproc) then
              write(sdat%logunit,'(2a,i0,a)') subname, &
@@ -1721,7 +1723,7 @@ contains
     ! This bypasses the source mesh, pio decomposition and ESMF regrid entirely.
     ! ******************************************************************************
     if (per_stream%is_zonal) then
-       call shr_strdata_readstrm_zonal(sdat, per_stream, pioid, nt, fldbun_data, rc)
+       call shr_strdata_zonal_readstrm(sdat, per_stream, pioid, nt, fldbun_data, rc)
        if (chkerr(rc,__LINE__,u_FILE_u)) return
        return
     end if
@@ -2205,7 +2207,7 @@ contains
   end subroutine shr_strdata_readstrm
 
   !===============================================================================
-  subroutine zonal_read_coord(sdat, ns, coordname, rc)
+  subroutine shr_strdata_zonal_read_coord(sdat, ns, coordname, rc)
 
     ! Read the source latitude coordinate (whole 1-D array, redundantly on every
     ! task) from the first data file of a nearest-lat (zonal) stream.  Mirrors the
@@ -2223,7 +2225,7 @@ contains
     type(var_desc_t)  :: varid
     integer           :: dimid, nlat, rcode, istat
     character(len=CX) :: filename
-    character(len=*), parameter :: subname = '(zonal_read_coord) '
+    character(len=*), parameter :: subname = '(shr_strdata_zonal_read_coord) '
     !-------------------------------------------------------------------------------
 
     rc = ESMF_SUCCESS
@@ -2253,10 +2255,10 @@ contains
        write(sdat%logunit,'(2a,i0,a,i0)') subname,'Stream: ',ns,' number of source latitudes = ',nlat
     end if
 
-  end subroutine zonal_read_coord
+  end subroutine shr_strdata_zonal_read_coord
 
   !===============================================================================
-  subroutine shr_strdata_readstrm_zonal(sdat, per_stream, pioid, nt, fldbun_data, rc)
+  subroutine shr_strdata_zonal_readstrm(sdat, per_stream, pioid, nt, fldbun_data, rc)
 
     ! Read one time record (nt) of every field in a nearest-lat (zonal) stream and
     ! gather it to the nearest model latitude, filling fldbun_data on the model mesh.
@@ -2277,12 +2279,12 @@ contains
     ! local variables
     type(ESMF_Field)      :: field_dst
     type(var_desc_t)      :: varid
-    integer               :: nf, n, nlat, nlev, rcode, pio_iovartype
+    integer               :: nf, ng, nlat, nlev, rcode, pio_iovartype
     real(r8), pointer     :: dstptr1d(:)         ! model field data (lsize)
     real(r8), pointer     :: dstptr2d(:,:)       ! model field data (nlev,lsize)
     real(r4), allocatable :: src_r4_1d(:), src_r4_2d(:,:)
     real(r8), allocatable :: src_r8_1d(:), src_r8_2d(:,:)
-    character(len=*), parameter :: subname = '(shr_strdata_readstrm_zonal) '
+    character(len=*), parameter :: subname = '(shr_strdata_zonal_readstrm) '
     !-------------------------------------------------------------------------------
 
     rc = ESMF_SUCCESS
@@ -2304,15 +2306,15 @@ contains
           if (pio_iovartype == PIO_REAL) then
              allocate(src_r4_2d(nlat,nlev))
              rcode = pio_get_var(pioid, varid, start=(/1,1,nt/), count=(/nlat,nlev,1/), ival=src_r4_2d)
-             do n = 1, size(dstptr2d, dim=2)
-                dstptr2d(:,n) = real(src_r4_2d(per_stream%latindex(n),:), kind=r8)
+             do ng = 1, size(dstptr2d, dim=2)
+                dstptr2d(:,ng) = real(src_r4_2d(per_stream%latindex(ng),:), kind=r8)
              end do
              deallocate(src_r4_2d)
           else if (pio_iovartype == PIO_DOUBLE) then
              allocate(src_r8_2d(nlat,nlev))
              rcode = pio_get_var(pioid, varid, start=(/1,1,nt/), count=(/nlat,nlev,1/), ival=src_r8_2d)
-             do n = 1, size(dstptr2d, dim=2)
-                dstptr2d(:,n) = src_r8_2d(per_stream%latindex(n),:)
+             do ng = 1, size(dstptr2d, dim=2)
+                dstptr2d(:,ng) = src_r8_2d(per_stream%latindex(ng),:)
              end do
              deallocate(src_r8_2d)
           else
@@ -2326,15 +2328,15 @@ contains
           if (pio_iovartype == PIO_REAL) then
              allocate(src_r4_1d(nlat))
              rcode = pio_get_var(pioid, varid, start=(/1,nt/), count=(/nlat,1/), ival=src_r4_1d)
-             do n = 1, size(dstptr1d)
-                dstptr1d(n) = real(src_r4_1d(per_stream%latindex(n)), kind=r8)
+             do ng = 1, size(dstptr1d)
+                dstptr1d(ng) = real(src_r4_1d(per_stream%latindex(ng)), kind=r8)
              end do
              deallocate(src_r4_1d)
           else if (pio_iovartype == PIO_DOUBLE) then
              allocate(src_r8_1d(nlat))
              rcode = pio_get_var(pioid, varid, start=(/1,nt/), count=(/nlat,1/), ival=src_r8_1d)
-             do n = 1, size(dstptr1d)
-                dstptr1d(n) = src_r8_1d(per_stream%latindex(n))
+             do ng = 1, size(dstptr1d)
+                dstptr1d(ng) = src_r8_1d(per_stream%latindex(ng))
              end do
              deallocate(src_r8_1d)
           else
@@ -2357,7 +2359,7 @@ contains
        end if
     end do
 
-  end subroutine shr_strdata_readstrm_zonal
+  end subroutine shr_strdata_zonal_readstrm
 
   !===============================================================================
   subroutine shr_strdata_set_stream_iodesc(sdat, per_stream, fldname, pioid, rc)
