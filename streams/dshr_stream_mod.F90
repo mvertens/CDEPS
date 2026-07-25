@@ -117,7 +117,7 @@ module dshr_stream_mod
      integer           :: yearLast     = -1                     ! last  year to use in t-axis (yyyymmdd)
      integer           :: yearAlign    = -1                     ! align yearFirst with this model year
      character(len=CS) :: lev_dimname  = 'null'                 ! name of vertical dimension if any
-     character(len=CS) :: lat_name     = 'lat'                  ! name of latitude coord/dim (mapalgo='nearest_lat' streams)
+     character(len=CS) :: lat_dimname     = 'lat'                  ! name of latitude coord/dim (mapalgo='nearest_lat' streams)
      character(len=CS) :: taxMode      = shr_stream_taxis_cycle ! cycling option for time axis
      character(len=CS) :: tInterpAlgo  = 'linear'               ! algorithm to use for time interpolation
      character(len=CL) :: mapalgo      = 'bilinear'             ! type of mapping - default is 'bilinear'
@@ -335,9 +335,9 @@ contains
           endif
 
           ! Determine name of latitude coordinate (optional; used by mapalgo='nearest_lat')
-          p => item(getElementsByTagname(streamnode, "lat_name"), 0)
+          p => item(getElementsByTagname(streamnode, "lat_dimname"), 0)
           if (associated(p)) then
-             call extractDataContent(p, streamdat(i)%lat_name)
+             call extractDataContent(p, streamdat(i)%lat_dimname)
           endif
 
           ! Determine input data files
@@ -429,7 +429,7 @@ contains
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
        call ESMF_VMBroadCast(vm, streamdat(i)%lev_dimname,  CS, 0, rc=rc)
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
-       call ESMF_VMBroadCast(vm, streamdat(i)%lat_name,     CS, 0, rc=rc)
+       call ESMF_VMBroadCast(vm, streamdat(i)%lat_dimname,     CS, 0, rc=rc)
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
        call ESMF_VMBroadCast(vm, streamdat(i)%taxmode,      CS, 0, rc=rc)
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
@@ -491,7 +491,7 @@ contains
        stream_offset, stream_taxmode, stream_tintalgo, stream_dtlimit, &
        stream_fldlistFile, stream_fldListModel, stream_fileNames, &
        logunit, compname, isroot_task, stream_src_mask_val, stream_dst_mask_val, &
-       stream_lat_name)
+       stream_lat_dimname)
 
     use ESMF, only : ESMF_VM, ESMF_VMGetCurrent
 
@@ -523,7 +523,7 @@ contains
     logical                     ,intent(in)              :: isroot_task            ! mainproc
     integer                     ,optional, intent(in)    :: stream_src_mask_val    ! source mask value
     integer                     ,optional, intent(in)    :: stream_dst_mask_val    ! destination mask value
-    character(len=*)            ,optional, intent(in)    :: stream_lat_name        ! latitude coord name (nearest_lat streams)
+    character(len=*)            ,optional, intent(in)    :: stream_lat_dimname        ! latitude coord name (nearest_lat streams)
 
     ! local variables
     integer       :: n
@@ -547,7 +547,7 @@ contains
     streamdat(1)%meshFile     = trim(stream_meshFile)
     streamdat(1)%lev_dimname  = trim(stream_lev_dimname)
     streamdat(1)%mapalgo      = trim(stream_mapalgo)
-    if (present(stream_lat_name)) streamdat(1)%lat_name = trim(stream_lat_name)
+    if (present(stream_lat_dimname)) streamdat(1)%lat_dimname = trim(stream_lat_dimname)
 
     streamdat(1)%yearFirst    = stream_yearFirst
     streamdat(1)%yearLast     = stream_yearLast
@@ -770,8 +770,8 @@ contains
       endif
 
       ! Optional latitude coordinate name (used by mapalgo='nearest_lat'); defaults to 'lat'
-      if( ESMF_ConfigGetLen(config=CF, label="stream_lat_name"//mystrm//':', rc=rc) > 0 ) then
-        call ESMF_ConfigGetAttribute(CF,value=streamdat(i)%lat_name,label="stream_lat_name"//mystrm//':', rc=rc)
+      if( ESMF_ConfigGetLen(config=CF, label="stream_lat_dimname"//mystrm//':', rc=rc) > 0 ) then
+        call ESMF_ConfigGetAttribute(CF,value=streamdat(i)%lat_dimname,label="stream_lat_dimname"//mystrm//':', rc=rc)
         if (ChkErr(rc,__LINE__,u_FILE_u)) return
       endif
 

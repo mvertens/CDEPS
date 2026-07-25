@@ -271,7 +271,7 @@ contains
        stream_filenames, stream_fldlistFile, stream_fldListModel, &
        stream_yearFirst, stream_yearLast, stream_yearAlign, &
        stream_offset, stream_taxmode, stream_dtlimit, stream_tintalgo, &
-       stream_src_mask, stream_dst_mask, stream_name, stream_lat_name, rc)
+       stream_src_mask, stream_dst_mask, stream_name, stream_lat_dimname, rc)
 
     ! input/output variables
     type(shr_strdata_type)      , intent(inout) :: sdat                   ! stream data type
@@ -296,7 +296,7 @@ contains
     integer          , optional , intent(in)    :: stream_src_mask        ! source mask value
     integer          , optional , intent(in)    :: stream_dst_mask        ! destination mask value
     character(len=*) , optional , intent(in)    :: stream_name            ! name of stream
-    character(len=*) , optional , intent(in)    :: stream_lat_name        ! latitude coord name (nearest_lat streams)
+    character(len=*) , optional , intent(in)    :: stream_lat_dimname     ! latitude coord name (nearest_lat streams)
     integer          , optional , intent(out)   :: rc                     ! error code
 
     ! local variables
@@ -351,7 +351,7 @@ contains
          stream_offset, stream_taxmode, stream_tintalgo, stream_dtlimit, &
          stream_fldlistFile, stream_fldListModel, stream_fileNames, &
          sdat%logunit, trim(compname), sdat%mainproc, src_mask, dst_mask, &
-         stream_lat_name=stream_lat_name)
+         stream_lat_dimname=stream_lat_dimname)
 
     ! Now finish initializing sdat
     call shr_strdata_init(sdat, model_clock, stream_name, rc)
@@ -529,7 +529,7 @@ contains
        ! then reduces to a purely local gather (no ESMF mesh, routehandle or comms).
        sdat%pstrm(ns)%is_zonal = (trim(sdat%stream(ns)%mapalgo) == shr_stream_mapalgo_nearest_lat)
        if (sdat%pstrm(ns)%is_zonal) then
-          call shr_strdata_zonal_read_coord(sdat, ns, trim(sdat%stream(ns)%lat_name), rc=rc)
+          call shr_strdata_zonal_read_coord(sdat, ns, trim(sdat%stream(ns)%lat_dimname), rc=rc)
           if (chkerr(rc,__LINE__,u_FILE_u)) return
           allocate(sdat%pstrm(ns)%latindex(sdat%model_lsize), stat=istat)
           if (istat /= 0) then
