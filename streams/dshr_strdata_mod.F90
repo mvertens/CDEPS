@@ -505,16 +505,10 @@ contains
 
        ! Consistency check: mapalgo vs source mesh file.
        ! nearest_lat is a zonal (lat-only) mapping and must NOT have a source mesh;
-       ! every other (mesh-based) mapping algorithm requires a source mesh file.
+       ! every other (mesh-based) mapping algorithm requires a source mesh file 
        if (trim(sdat%stream(ns)%mapalgo) == shr_stream_mapalgo_nearest_lat) then
           if (trim(filename) /= 'none') then
              call shr_log_error(subname//": ERROR: mapalgo='nearest_lat' requires meshfile='none'", rc=rc)
-             return
-          end if
-       else
-          if (trim(filename) == 'none') then
-             call shr_log_error(subname//": ERROR: mapalgo='"//trim(sdat%stream(ns)%mapalgo)//&
-                  "' requires a stream mesh file (meshfile='none' is only valid for nearest_lat)", rc=rc)
              return
           end if
        end if
