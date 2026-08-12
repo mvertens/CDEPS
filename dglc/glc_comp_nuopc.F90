@@ -401,7 +401,7 @@ contains
        ! Initialize stream data type
        if (trim(datamode) /= 'noevolve') then
           call shr_strdata_init_from_config(sdat(ns), streamfilename, model_meshes(ns), nx_global(ns), ny_global(ns), &
-               is_scol=.false., clock=clock, compname='GLC', logunit=logunit, rc=rc)
+               clock, 'GLC', logunit, rc=rc)
           if (ChkErr(rc,__LINE__,u_FILE_u)) return
        end if
 
