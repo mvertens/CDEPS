@@ -67,16 +67,16 @@
 
   <stream_entry name="MEPS">
     <stream_meshfile>
-      <meshfile>/cluster/work/users/cmi022/new_mesh_files/mesh_cdf5_ice_090626.nc</meshfile>
+      <meshfile>/nobackup/forsk/sm_climi/new_mesh_files/mesh_cdf5_ice_090626.nc</meshfile>
     </stream_meshfile>
     <stream_datafiles>
-      <file>/cluster/work/users/cmi022/forcing_weps/ice/monthly_files_withcal/ww3_ice_202202.nc</file>
-      <file>/cluster/work/users/cmi022/forcing_weps/ice/monthly_files_withcal/ww3_ice_202203.nc</file>
-      <file>/cluster/work/users/cmi022/forcing_weps/ice/monthly_files_withcal/ww3_ice_202204.nc</file>
-      <file>/cluster/work/users/cmi022/forcing_weps/ice/monthly_files_withcal/ww3_ice_202205.nc</file>
-      <file>/cluster/work/users/cmi022/forcing_weps/ice/monthly_files_withcal/ww3_ice_202206.nc</file>
-      <file>/cluster/work/users/cmi022/forcing_weps/ice/monthly_files_withcal/ww3_ice_202207.nc</file>
-      <file>/cluster/work/users/cmi022/forcing_weps/ice/monthly_files_withcal/ww3_ice_202208.nc</file>
+      <file>/nobackup/forsk/sm_climi/forcing_weps/ice/monthly_files_withcal/ww3_ice_202202.nc</file>
+      <file>/nobackup/forsk/sm_climi/forcing_weps/ice/monthly_files_withcal/ww3_ice_202203.nc</file>
+      <file>/nobackup/forsk/sm_climi/forcing_weps/ice/monthly_files_withcal/ww3_ice_202204.nc</file>
+      <file>/nobackup/forsk/sm_climi/forcing_weps/ice/monthly_files_withcal/ww3_ice_202205.nc</file>
+      <file>/nobackup/forsk/sm_climi/forcing_weps/ice/monthly_files_withcal/ww3_ice_202206.nc</file>
+      <file>/nobackup/forsk/sm_climi/forcing_weps/ice/monthly_files_withcal/ww3_ice_202207.nc</file>
+      <file>/nobackup/forsk/sm_climi/forcing_weps/ice/monthly_files_withcal/ww3_ice_202208.nc</file>
     </stream_datafiles>
     <stream_datavars>
       <var>ice_thick  Si_thick</var>
