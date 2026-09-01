@@ -5271,7 +5271,7 @@
       <meshfile>$ATM_DOMAIN_MESH</meshfile>
     </stream_meshfile>
     <stream_datafiles>
-      <file first_year="$DATM_YR_START" last_year="$DATM_YR_END">$DATM_CPLHIST_DIR/$DATM_CPLHIST_CASE.cpl.ha2x1d.%ym.nc</file>
+      <file first_year="$DATM_YR_START" last_year="$DATM_YR_END">$DATM_CPLHIST_DIR/$DATM_CPLHIST_CASE.cpl.hx.atm.24h.avrg.%ymd.nc</file>
     </stream_datafiles>
     <stream_datavars>
       <!-- the mediator writes the two ungridded elements of Faxa_ndep as

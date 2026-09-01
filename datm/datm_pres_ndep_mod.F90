@@ -23,8 +23,8 @@ module datm_pres_ndep_mod
   real(r8), pointer :: strm_Faxa_ndep_noy_dry(:) => null() ! stream cmip7 ndep data
   real(r8), pointer :: strm_Faxa_ndep_noy_wet(:) => null() ! stream cmip7 ndep data
 
-  real(r8), pointer :: strm_Faxa_ndep_nhx(:)     => null() ! pre-cmip7 ndep data
-  real(r8), pointer :: strm_Faxa_ndep_noy(:)     => null() ! pre-cmip7 ndep data
+  real(r8), pointer :: strm_Faxa_ndep_nhx(:)     => null() ! pre-cmip7 ndep data and cplhist
+  real(r8), pointer :: strm_Faxa_ndep_noy(:)     => null() ! pre-cmip7 ndep data and cplhist
 
 
   character(len=*), parameter :: u_FILE_u = &
@@ -75,7 +75,7 @@ contains
     call shr_strdata_get_stream_pointer(sdat, 'Faxa_ndep_noy_wet', strm_Faxa_ndep_noy_wet, rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
 
-    ! cmip6 ndep forcing
+    ! cmip6 ndep forcing and cplhist
     call shr_strdata_get_stream_pointer( sdat, 'Faxa_ndep_nhx', strm_Faxa_ndep_nhx, rc)
     if (ChkErr(rc,__LINE__,u_FILE_u)) return
     call shr_strdata_get_stream_pointer( sdat, 'Faxa_ndep_noy', strm_Faxa_ndep_noy, rc)
