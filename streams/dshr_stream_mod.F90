@@ -1646,7 +1646,8 @@ contains
 
     pos = index(trim(rest), " ")
     if (pos == 0) then
-       call shr_sys_abort(subName//" stream var entry needs at least two fields: "//trim(entry))
+       call shr_sys_abort(subName//" stream var entry needs at least two fields: "//trim(entry), &
+            file=u_FILE_u, line=__LINE__)
     end if
     var%nameinfile = rest(1:pos-1)
 
@@ -1663,7 +1664,8 @@ contains
     third = adjustl(rest(next+1:))
     read(third, *, iostat=ios) var%scale_factor
     if (ios /= 0) then
-       call shr_sys_abort(subName//" could not read scale factor from stream var entry: "//trim(entry))
+       call shr_sys_abort(subName//" could not read scale factor from stream var entry: "//trim(entry), &
+            file=u_FILE_u, line=__LINE__)
     end if
 
   end subroutine parse_var_entry

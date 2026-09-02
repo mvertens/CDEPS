@@ -96,13 +96,6 @@ contains
 
     ! Separate dry and wet deposition fields are summed where the stream provides
     ! them; otherwise the combined fields are used.
-    !
-    ! No unit conversion happens here.  Streams whose data is not already in
-    ! kgN/m2/s declare a stream_scale_factor in the stream definition xml, and
-    ! the conversion is applied as the data is read.  Doing it here was wrong:
-    ! the same two field names are supplied in gN/m2/s by the CMIP6 forcing
-    ! datasets and in kgN/m2/s by cplhist output, so the field names cannot say
-    ! which conversion, if any, is needed.
     if (associated(strm_Faxa_ndep_nhx_dry)) then
        Faxa_ndep(1,:) = strm_Faxa_ndep_nhx_dry(:) + strm_Faxa_ndep_nhx_wet(:)
        Faxa_ndep(2,:) = strm_Faxa_ndep_noy_dry(:) + strm_Faxa_ndep_noy_wet(:)
