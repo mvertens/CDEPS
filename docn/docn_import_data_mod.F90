@@ -35,7 +35,7 @@ contains
       integer                     :: n
       !-------------------------------------------------------------------------------
 
-      ! Translate the colon deliminted string (import_data_fields) into a character array (fieldnamelist)
+      ! Translate the colon delimited string (import_data_fields) into a character array (fieldnamelist)
       ! Note that the following call allocates the memory for fieldnamelist
       call docn_get_import_fields(import_data_fields, fieldnamelist, rc)
 
@@ -71,13 +71,13 @@ contains
    subroutine docn_get_import_fields(str, flds, rc)
       use shr_log_mod          , only : shr_log_error
       ! input/output variables
-      character(len=*)               , intent(in)  :: str     ! colon deliminted string to search
+      character(len=*)               , intent(in)  :: str     ! colon delimited string to search
       character(len=*) , allocatable , intent(out) :: flds(:) ! memory will be allocate for flds
       integer                        , intent(out) :: rc
       ! local variables
-      integer          :: i,k,n ! generic indecies
+      integer          :: i,k,n ! generic indices
       integer          :: nflds ! allocatable size of flds
-      integer          :: count ! counts occurances of char
+      integer          :: count ! counts occurrences of char
       integer          :: i0,i1 ! name = list(i0:i1)
       integer          :: nChar ! temporary
       logical          :: valid ! check if str is valid
@@ -85,7 +85,7 @@ contains
 
       rc = ESMF_SUCCESS
 
-      ! check that this is a str is a valid colon dlimited list
+      ! check that str is a valid colon delimited list
       valid = .true.
       nChar = len_trim(str)
       if (nChar < 1) then                     ! list is an empty string
