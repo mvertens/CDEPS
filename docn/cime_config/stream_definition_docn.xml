@@ -35,10 +35,10 @@
 
   <stream_entry name="interannual">
     <stream_meshfile>
-      <meshfile >$DIN_LOC_ROOT/atm/cam/sst/sst_HadOIBl_bc_1x1_clim_c101029_ESMFmesh_120520.nc</meshfile>
+      <meshfile>$DIN_LOC_ROOT/atm/cam/sst/sst_HadOIBl_bc_1x1_clim_c101029_ESMFmesh_120520.nc</meshfile>
     </stream_meshfile>
     <stream_datafiles>
-      <file>$DIN_LOC_ROOT/atm/cam/sst/sst_HadOIBl_bc_1x1_1850_2014_c150416.nc</file>
+      <file>$DIN_LOC_ROOT/atm/cam/sst/sst_input4MIPs_SSTsAndSeaIce_CMIP_PCMDI-AMIP-1-1-10_gn_187001-202212_c20260924.nc</file>
     </stream_datafiles>
     <stream_datavars>
       <var>SST_cpl So_t</var>
@@ -48,15 +48,15 @@
       <mapalgo>bilinear</mapalgo>
     </stream_mapalgo>
     <stream_vectors>null</stream_vectors>
-    <stream_year_align>1</stream_year_align>
-    <stream_year_first>1850</stream_year_first>
-    <stream_year_last>2014</stream_year_last>
+    <stream_year_align>1870</stream_year_align>
+    <stream_year_first>1870</stream_year_first>
+    <stream_year_last>2022</stream_year_last>
     <stream_offset>0</stream_offset>
     <stream_tintalgo>
       <tintalgo>linear</tintalgo>
     </stream_tintalgo>
     <stream_taxmode>
-      <taxmode>cycle</taxmode>
+      <taxmode>extend</taxmode>
     </stream_taxmode>
     <stream_dtlimit>
       <dtlimit>1.5</dtlimit>
