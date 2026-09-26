@@ -199,7 +199,7 @@ contains
     integer           :: inst_index         ! number of current instance (ie. 1)
     integer           :: nu                 ! unit number
     integer           :: ierr               ! error code
-    character(len=CL) :: import_data_fields ! colon deliminted strings of input data fields
+    character(len=CL) :: import_data_fields ! colon delimited strings of input data fields
     integer           :: bcasttmp(4)
     real(r8)          :: rtmp(1)
     type(ESMF_VM)     :: vm
