@@ -33,3 +33,6 @@
 
 # ignore pycache
 __pycache__
+
+# sphinx documentation build output
+doc/build/
