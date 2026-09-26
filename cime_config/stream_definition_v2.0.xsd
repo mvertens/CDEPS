@@ -113,6 +113,8 @@
       <xs:pattern value="extend"/>
       <xs:pattern value="cycle"/>
       <xs:pattern value="limit"/>
+      <!-- case xml variable reference, e.g. $SSTICE_TAXMODE -->
+      <xs:pattern value="\$[A-Za-z0-9_]+"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="taxmode">

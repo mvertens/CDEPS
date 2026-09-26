@@ -109,10 +109,11 @@ DOCN%DOM
    - datamode: sstdata
 
 DOCN%IAF
-   - SST data provided by a file
-   - docn_mode: interannual
-   - streams: interannual
-   - datamode: iaf
+   - Interannual SST data provided by a file (same as DOCN%DOM, but the
+     SSTICE_* defaults select interannual data, as for AMIP/HIST compsets)
+   - docn_mode: prescribed
+   - streams: prescribed
+   - datamode: sstdata
 
 DOCN%SOM
    - Slab Ocean Model is used to calculate sea surface temperature.
@@ -175,10 +176,17 @@ SSTICE_YR_ALIGN
      should be set to the year given in RUN_STARTDATE.
      If SSTICE_YEAR_ALIGN is later than the model's starting year, or if the model is
      run after the prescribed data ends (as determined by SSTICE_YEAR_END), the
-     default behavior is to assume that the data from SSTICE_YEAR_START to
-     SSTICE_YEAR_END cyclically repeats. This behavior is controlled by the
-     &quot;taxmode&quot; stream option; see the data model documentation for more details.
+     behavior is set by SSTICE_TAXMODE.
      (only used by both DOCN runing in prescribed mode and CICE running in prescribed mode)
+
+SSTICE_TAXMODE
+   - Time axis mode for the prescribed SST and ice coverage stream.
+     cycle (default): data from SSTICE_YEAR_START to SSTICE_YEAR_END cyclically repeats
+     (appropriate for climatological data).
+     extend (AMIP/HIST and DOCN%IAF compsets): the first/last data values are held
+     outside the data time range (appropriate for interannual data).
+     limit: the model aborts if run outside the data time range.
+     Only used by DOCN running in prescribed mode.
 
 DOCN_AQPCONST_VALUE
    - Sets globally constant SST value and is only used when DOCN%AQPCONST is present in the compset.
@@ -208,7 +216,7 @@ DOCN_CPLHIST_YR_ALIGN
      Only used if DOCN_MODE=cplhist.
 
 DOCN_IMPORT_FIELDS
-   - A column delimited set of import fields that are advertised by DOCN but never used.
+   - A colon delimited set of import fields that are advertised by DOCN but never used.
      In some cases it is needed for DOCN to advertise import fields even though it never will actually use them.
      This is needed in order for the mediator to add fields that would
      be sent to the ocean from the atmosphere, ice and runoff if the
