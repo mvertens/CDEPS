@@ -247,8 +247,23 @@
     cycle: data from SSTICE_YEAR_START to SSTICE_YEAR_END cyclically repeats
     (appropriate for climatological data).
     extend: the first/last data values are held outside the data time range
-    (appropriate for interannual data).
+    (appropriate for interannual data; requires SSTICE_DTLIMIT=1.e30).
     limit: the model aborts if run outside the data time range.
+    This is only used when DOCN_MODE=prescribed.</desc>
+  </entry>
+
+  <entry id="SSTICE_DTLIMIT">
+    <type>real</type>
+    <valid_values></valid_values>
+    <default_value>1.5</default_value>
+    <values match="last">
+      <value compset="(AMIP_|HIST[CE]?_|20TR_|5505_|PIPD_|%TSCH|_DOCN%IAF_)">1.e30</value>
+    </values>
+    <group>run_component_cam_sstice</group>
+    <file>env_run.xml</file>
+    <desc>Maximum allowed ratio of the model time step to the data time step for the
+    prescribed SST and ice coverage stream; exceeding it aborts the run.
+    Must be 1.e30 when SSTICE_TAXMODE=extend.
     This is only used when DOCN_MODE=prescribed.</desc>
   </entry>
 

@@ -28,7 +28,7 @@
       <taxmode>$SSTICE_TAXMODE</taxmode>
     </stream_taxmode>
     <stream_dtlimit>
-      <dtlimit>1.5</dtlimit>
+      <dtlimit>$SSTICE_DTLIMIT</dtlimit>
     </stream_dtlimit>
     <stream_readmode>single</stream_readmode>
   </stream_entry>

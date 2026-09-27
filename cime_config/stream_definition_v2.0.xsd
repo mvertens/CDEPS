@@ -108,19 +108,12 @@
     </xs:complexType>
   </xs:element>
 
-  <xs:simpleType name="taxmodeType">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="extend"/>
-      <xs:pattern value="cycle"/>
-      <xs:pattern value="limit"/>
-      <!-- case xml variable reference, e.g. $SSTICE_TAXMODE -->
-      <xs:pattern value="\$[A-Za-z0-9_]+"/>
-    </xs:restriction>
-  </xs:simpleType>
+  <!-- taxmode may be a case xml variable reference (e.g. $SSTICE_TAXMODE); the resolved
+       value is checked in stream_cdeps.py -->
   <xs:element name="taxmode">
     <xs:complexType>
       <xs:simpleContent>
-        <xs:extension base="taxmodeType">
+        <xs:extension base="xs:string">
           <xs:attribute ref="model_grid"/>
           <xs:attribute ref="compset"/>
         </xs:extension>

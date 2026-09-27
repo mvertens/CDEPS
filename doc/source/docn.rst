@@ -184,8 +184,15 @@ SSTICE_TAXMODE
      cycle (default): data from SSTICE_YEAR_START to SSTICE_YEAR_END cyclically repeats
      (appropriate for climatological data).
      extend (AMIP/HIST and DOCN%IAF compsets): the first/last data values are held
-     outside the data time range (appropriate for interannual data).
+     outside the data time range (appropriate for interannual data; requires SSTICE_DTLIMIT=1.e30).
      limit: the model aborts if run outside the data time range.
+     Only used by DOCN running in prescribed mode.
+
+SSTICE_DTLIMIT
+   - Maximum allowed ratio of the model time step to the data time step for the
+     prescribed SST and ice coverage stream; exceeding it aborts the run.
+     1.5 by default, 1.e30 for AMIP/HIST and DOCN%IAF compsets.
+     Must be 1.e30 when SSTICE_TAXMODE=extend (checked by buildnml).
      Only used by DOCN running in prescribed mode.
 
 DOCN_AQPCONST_VALUE

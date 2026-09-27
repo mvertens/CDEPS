@@ -361,6 +361,35 @@ class StreamCDEPS(GenericXML):
                             "<file>", ""
                         ).replace("</file>", "")
 
+            # check the resolved taxmode (it may come from a case xml variable or user mods)
+            taxmode = stream_vars["stream_taxmode"]
+            expect(
+                taxmode in valid_values["taxmode"],
+                "taxmode can only have values of {} for stream {}, found '{}'".format(
+                    valid_values["taxmode"], stream_name, taxmode
+                ),
+            )
+            # same check as in shr_stream_init (dshr_stream_mod.F90)
+            if taxmode == "extend":
+                # allow quotes (from user mods) and Fortran exponents (e.g. 1.d30)
+                dtlimit = str(stream_vars["stream_dtlimit"])
+                dtlimit = re.sub(r"[\"\']", "", dtlimit).replace("d", "e").replace("D", "e")
+                try:
+                    dtlimit = float(dtlimit)
+                except ValueError:
+                    expect(
+                        False,
+                        "dtlimit must be a number for stream {}, found '{}'".format(
+                            stream_name, stream_vars["stream_dtlimit"]
+                        ),
+                    )
+                expect(
+                    dtlimit >= 1.e10,
+                    "dtlimit must be set to 1.e30 when taxmode is extend for stream {}, found '{}'".format(
+                        stream_name, stream_vars["stream_dtlimit"]
+                    ),
+                )
+
             # lat_dimname is optional (only used by mapalgo='nearest_lat'); default to 'lat'
             # The following only applies to cases where the stream_mapalgo is 'nearest_lat'.
             # If this is not the case, then this variable is ignored. Currently, there is no out-of-the
