@@ -587,7 +587,7 @@ contains
           if (ChkErr(rc,__LINE__,u_FILE_u)) return
 
           select case (trim(datamode))
-          case('sstdata', 'sst_aquap_file', 'cplhist', 'multilev', 'mulitilev_sstdata', 'multilev_cplhist')
+          case('sstdata', 'sst_aquap_file', 'cplhist', 'multilev', 'multilev_sstdata', 'multilev_cplhist')
              call dshr_restart_read(restfilm, rpfile, logunit, my_task, mpicom, sdat, rc)
              if (ChkErr(rc,__LINE__,u_FILE_u)) return
           case('som', 'som_aquap')
@@ -643,7 +643,7 @@ contains
        if (ChkErr(rc,__LINE__,u_FILE_u)) return
 
        select case (trim(datamode))
-       case('sstdata', 'sst_aquap_file', 'cplhist', 'multilev', 'mulitilev_sstdata', 'multilev_cplhist')
+       case('sstdata', 'sst_aquap_file', 'cplhist', 'multilev', 'multilev_sstdata', 'multilev_cplhist')
           call dshr_restart_write(rpfile, case_name, 'docn', inst_suffix, target_ymd, target_tod, logunit, &
                my_task, sdat, rc)
           if (ChkErr(rc,__LINE__,u_FILE_u)) return
