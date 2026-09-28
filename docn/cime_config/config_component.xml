@@ -140,17 +140,6 @@
     <desc>Sets SOM aquaplanet file</desc>
   </entry>
 
-  <entry id="SSTICE_STREAM">
-    <type>char</type>
-    <valid_values></valid_values>
-    <default_value>CAMDATA</default_value>
-    <group>run_component_docn</group>
-    <file>env_run.xml</file>
-    <desc>Prescribed SST and ice coverage stream name.
-    Sets SST and ice coverage stream name.
-    This is only used when DOCN_MODE=prescribed.</desc>
-  </entry>
-
   <entry id="SSTICE_DATA_FILENAME">
     <type>char</type>
     <valid_values></valid_values>
