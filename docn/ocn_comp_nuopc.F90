@@ -286,8 +286,9 @@ contains
     export_all = (bcasttmp(4) == 1)
     sst_constant_value = rtmp(1)
 
-    ! Special logic for prescribed aquaplanet
-    if (datamode(1:9) == 'sst_aquap' .and. trim(datamode) /= 'sst_aquap_constant') then
+    ! Special logic for prescribed analytic aquaplanet (sst_aquap1 ... sst_aquap10)
+    if (datamode(1:9) == 'sst_aquap' .and. trim(datamode) /= 'sst_aquap_constant' &
+                                     .and. trim(datamode) /= 'sst_aquap_file') then
        ! First determine the prescribed aquaplanet option
        if (len_trim(datamode) == 10) then
           read(datamode(10:10),'(i1)') aquap_option

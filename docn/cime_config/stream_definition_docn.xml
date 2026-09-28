@@ -113,10 +113,10 @@
 
   <stream_entry name="aquapfile">
     <stream_meshfile>
-      <meshfile model_grid="_oi%0.9x1.25">%DIN_LOC_ROOT/share/meshes/fv0.9x1.25_141008_polemod_ESMFmesh.nc</meshfile>
+      <meshfile>$DOCN_AQPFILE_MESHFILE</meshfile>
     </stream_meshfile>
     <stream_datafiles>
-      <file model_grid="_oi%0.9x1.25">sst_c4aquasom_0.9x1.25_clim.c170512.nc</file>
+      <file>$DOCN_AQPFILE_DATAFILE</file>
     </stream_datafiles>
     <stream_datavars>
       <var>SST_cpl  So_t</var>

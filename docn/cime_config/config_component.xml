@@ -140,6 +140,27 @@
     <desc>Sets SOM aquaplanet file</desc>
   </entry>
 
+  <entry id="DOCN_AQPFILE_DATAFILE">
+    <type>char</type>
+    <valid_values></valid_values>
+    <default_value>UNSET</default_value>
+    <group>run_component_docn</group>
+    <file>env_run.xml</file>
+    <desc>Aquaplanet SST data file. Must be set by the user when DOCN%AQPFILE is
+    present in the compset (no default file is provided). The file must contain
+    the variable SST_cpl in degrees Celsius.</desc>
+  </entry>
+
+  <entry id="DOCN_AQPFILE_MESHFILE">
+    <type>char</type>
+    <valid_values></valid_values>
+    <default_value>UNSET</default_value>
+    <group>run_component_docn</group>
+    <file>env_run.xml</file>
+    <desc>ESMF mesh file describing the grid of DOCN_AQPFILE_DATAFILE. Must be set
+    by the user when DOCN%AQPFILE is present in the compset.</desc>
+  </entry>
+
   <entry id="SSTICE_DATA_FILENAME">
     <type>char</type>
     <valid_values></valid_values>

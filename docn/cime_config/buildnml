@@ -100,6 +100,12 @@ def _create_namelists(case, confdir, inst_string, infile, nmlgen, data_list_path
         if docn_mode == 'som' or docn_mode == 'som_aquap':
             expect (False, f"xml variable DOCN_SKIP_RESTART_READ cannot be TRUE for docn_mode {docn_mode}")
 
+    # No default data is provided for the aquaplanet file mode - the user must supply it
+    if docn_mode == 'sst_aquapfile':
+        for xmlvar in ('DOCN_AQPFILE_DATAFILE', 'DOCN_AQPFILE_MESHFILE'):
+            expect (case.get_value(xmlvar) not in (None, '', 'UNSET'),
+                    f"xml variable {xmlvar} must be set for docn_mode {docn_mode}")
+
     # Generate docn.streams.xml if needed
     print("docn_mode is {}".format(docn_mode))
     if (re.search(r'sst_aquap[0-9]+',docn_mode) is not None) or (docn_mode == 'sst_aquap_constant'):

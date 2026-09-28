@@ -135,9 +135,9 @@ DOCN%AQP[1-10]
 
 DOCN%AQPFILE
    - SST data provided by a file
-   - docn_mode: sst_aquap_file
+   - docn_mode: sst_aquapfile
    - streams: aquapfile
-   - datamode: sst_aquapfile
+   - datamode: sst_aquap_file
 
 DOCN%AQPCONST
    - Constant sea surface data from aquaplanet
@@ -199,7 +199,16 @@ DOCN_AQPCONST_VALUE
    - Sets globally constant SST value and is only used when DOCN%AQPCONST is present in the compset.
 
 DOCN_SOMAQP_DATAFILE
-   - Sets the SOM aquaplanet file and is only used when DOCN%AQPFILE is present in the compset.
+   - Sets the SOM aquaplanet file and is only used when DOCN%SOMAQP is present in the compset.
+
+DOCN_AQPFILE_DATAFILE
+   - Sets the aquaplanet SST data file and is only used when DOCN%AQPFILE is present in the compset.
+     No default file is provided, so this must be set by the user (buildnml aborts if it is UNSET).
+     The file must contain the variable SST_cpl in degrees Celsius.
+
+DOCN_AQPFILE_MESHFILE
+   - Sets the ESMF mesh file for DOCN_AQPFILE_DATAFILE and is only used when DOCN%AQPFILE
+     is present in the compset. Must be set by the user (buildnml aborts if it is UNSET).
 
 DOCN_CPLHIST_YR_START
    - Starting year to loop data over
