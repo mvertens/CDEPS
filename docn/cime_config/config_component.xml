@@ -99,7 +99,7 @@
     ocean mixed layer depths and bottom-of-the-slab Q-fluxes.
     Scientifically appropriate bottom-of-the-slab Q-fluxes are normally
     ocean resolution dependent and are derived from the ocean model output
-    of a fully coupled CCSM run.  Note that while this mode runs out of
+    of a fully coupled run.  Note that while this mode runs out of
     the box, the default SOM forcing file is not scientifically
     appropriate and is provided for testing and development purposes only.
     Users must create scientifically appropriate data for their particular
@@ -167,10 +167,8 @@
     <default_value>$DIN_LOC_ROOT/atm/cam/sst/sst_input4MIPs_SSTsAndSeaIce_CMIP_PCMDI-AMIP-1-1-10_gn_2000climo_c20260924.nc</default_value>
     <values match="last">
       <value compset="(AMIP_|HIST[CE]?_|20TR_|5505_|PIPD_|%TSCH|_DOCN%IAF_)">$DIN_LOC_ROOT/atm/cam/sst/sst_input4MIPs_SSTsAndSeaIce_CMIP_PCMDI-AMIP-1-1-10_gn_187001-202212_c20260924.nc</value>
-      <value compset="1850[CE]?_"                                           >$DIN_LOC_ROOT/atm/cam/sst/sst_input4MIPs_SSTsAndSeaIce_CMIP_PCMDI-AMIP-1-1-10_gn_piclimo_c20260924.nc</value>
-      <value compset="1850S_"                                               >$DIN_LOC_ROOT/ocn/docn7/SSTDATA/sst_ice_CMIP6_DECK_E3SM_1x1_1850_clim_c20190125.nc</value>
-      <value compset="1950_"                                                >$DIN_LOC_ROOT/ocn/docn7/SSTDATA/sst_ice_CMIP6_DECK_E3SM_1x1_1950_clim_c20180910.nc</value>
-      <value compset="2010S_" grid="a%ne30np4.*_oi%oEC60to30v3"             >$DIN_LOC_ROOT/ocn/docn7/SSTDATA/sst_ice_CMIP6_DECK_E3SM_1x1_2010_clim_c20190821.nc</value>
+      <value compset="1850_"                                                >$DIN_LOC_ROOT/atm/cam/sst/sst_input4MIPs_SSTsAndSeaIce_CMIP_PCMDI-AMIP-1-1-10_gn_piclimo_c20260924.nc</value>
+      <value compset="2010_"                                                >$DIN_LOC_ROOT/atm/cam/sst/sst_input4MIPs_SSTsAndSeaIce_CMIP_PCMDI-AMIP-1-1-10_gn_2010climo_c20260924.nc</value>
     </values>
     <group>run_component_docn</group>
     <file>env_run.xml</file>
@@ -183,7 +181,7 @@
     <type>char</type>
     <valid_values></valid_values>
     <default_value>$DIN_LOC_ROOT/atm/cam/sst/sst_HadOIBl_bc_1x1_clim_c101029_ESMFmesh_120520.nc</default_value>
-    <group>run_component_cam_sstice</group>
+    <group>run_component_docn</group>
     <file>env_run.xml</file>
     <desc>Prescribed SST and ice coverage mesh file name.
     Sets SST and ice coverage grid file name for prescribed runs.
@@ -197,7 +195,7 @@
     <values match="last">
       <value compset="(AMIP_|HIST[CE]?_|20TR_|5505_|PIPD_|%TSCH|_DOCN%IAF_)">1870</value>
     </values>
-    <group>run_component_cam_sstice</group>
+    <group>run_component_docn</group>
     <file>env_run.xml</file>
     <desc>The model year that corresponds to SSTICE_YEAR_START on the data file.
     Prescribed SST and ice coverage data will be aligned so that the first year of
@@ -219,7 +217,7 @@
     <values match="last">
       <value compset="(AMIP_|HIST[CE]?_|20TR_|5505_|PIPD_|%TSCH|_DOCN%IAF_)">1870</value>
     </values>
-    <group>run_component_cam_sstice</group>
+    <group>run_component_docn</group>
     <file>env_run.xml</file>
     <desc>The first year of data to use from SSTICE_DATA_FILENAME.
     This is the first year of prescribed SST and ice coverage data to use. For
@@ -235,7 +233,7 @@
     <values match="last">
       <value compset="(AMIP_|HIST[CE]?_|20TR_|5505_|PIPD_|%TSCH|_DOCN%IAF_)">2022</value>
     </values>
-    <group>run_component_cam_sstice</group>
+    <group>run_component_docn</group>
     <file>env_run.xml</file>
     <desc>The last year of data to use from SSTICE_DATA_FILENAME.
     This is the last year of prescribed SST and ice coverage data to use. For
@@ -251,7 +249,7 @@
     <values match="last">
       <value compset="(AMIP_|HIST[CE]?_|20TR_|5505_|PIPD_|%TSCH|_DOCN%IAF_)">extend</value>
     </values>
-    <group>run_component_cam_sstice</group>
+    <group>run_component_docn</group>
     <file>env_run.xml</file>
     <desc>Time axis mode for the prescribed SST and ice coverage stream.
     cycle: data from SSTICE_YEAR_START to SSTICE_YEAR_END cyclically repeats
@@ -269,7 +267,7 @@
     <values match="last">
       <value compset="(AMIP_|HIST[CE]?_|20TR_|5505_|PIPD_|%TSCH|_DOCN%IAF_)">1.e30</value>
     </values>
-    <group>run_component_cam_sstice</group>
+    <group>run_component_docn</group>
     <file>env_run.xml</file>
     <desc>Maximum allowed ratio of the model time step to the data time step for the
     prescribed SST and ice coverage stream; exceeding it aborts the run.
